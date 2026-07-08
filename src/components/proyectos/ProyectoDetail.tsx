@@ -57,7 +57,7 @@ export function ProyectoDetail() {
           <div>
             <div className="mb-4 flex flex-wrap items-center gap-3">
               <TrafficLightOrb estado={estado} size="md" label={`Gantt ${cumplimiento}%`} />
-              <span className="rounded-full bg-white/8 px-3 py-1 text-sm text-slate-300">{proyecto.sistemaOrigen}</span>
+              <span className="rounded-full bg-white/8 px-3 py-1 text-sm text-slate-300">{proyecto.categoria}</span>
               <span className="rounded-full bg-white/8 px-3 py-1 text-sm text-slate-300">{proyecto.estado}</span>
               <span className="rounded-full bg-white/8 px-3 py-1 text-sm text-slate-300">Plan a hoy {planificado}%</span>
             </div>
@@ -80,8 +80,8 @@ export function ProyectoDetail() {
                 <CalendarDays className="h-4 w-4 text-slate-500" />
                 {proyecto.fechaInicio} a {proyecto.fechaGoLive}
               </span>
-              <span>Razon social: {info.razonSocial}</span>
-              <span>RUT: {proyecto.rut}</span>
+              <span>Cliente: {info.cliente}</span>
+              <span>Stack: {info.stackTecnico}</span>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4 justify-self-start text-center lg:justify-self-end">

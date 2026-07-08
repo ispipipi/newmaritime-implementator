@@ -314,7 +314,7 @@ export function DashboardView() {
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <h3 className="font-semibold text-white">{proyecto.nombre}</h3>
-                    <p className="mt-1 text-sm text-slate-400">{proyecto.sistemaOrigen} · Go live {proyecto.fechaGoLive}</p>
+                    <p className="mt-1 text-sm text-slate-400">{proyecto.categoria} · Go live {proyecto.fechaGoLive}</p>
                   </div>
                   <TrafficLightOrb estado={semaforoCumplimientoProyecto(proyecto.id, tareas)} size="sm" />
                 </div>
@@ -488,7 +488,7 @@ function DashboardKpiDetalle({
                         {isSemaforo ? <TrafficLightOrb estado={estado} size="sm" /> : null}
                         <h3 className="truncate font-semibold text-white">{item.nombre}</h3>
                       </div>
-                      <p className="mt-1 text-sm text-slate-500">{item.sistemaOrigen} · Go live {item.fechaGoLive}</p>
+                      <p className="mt-1 text-sm text-slate-500">{item.categoria} · Go live {item.fechaGoLive}</p>
                       {isSemaforo ? <p className={`mt-2 text-xs font-semibold ${estado === 'rojo' ? 'text-red-200' : estado === 'amarillo' ? 'text-amber-200' : 'text-emerald-200'}`}>{semaforoText[estado]}</p> : null}
                     </div>
                     <div className="flex items-center gap-4">

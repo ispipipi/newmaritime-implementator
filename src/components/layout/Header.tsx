@@ -49,7 +49,7 @@ export function Header() {
 
     const proyectos = proyectosVisibles
       .filter((proyecto) =>
-        [proyecto.nombre, proyecto.rut, proyecto.razonSocial, proyecto.representanteLegal, proyecto.sistemaOrigen]
+        [proyecto.nombre, proyecto.cliente, proyecto.contactoPrincipal, proyecto.categoria]
           .some((value) => value.toLowerCase().includes(normalizedQuery)),
       )
       .slice(0, 5);
@@ -66,7 +66,7 @@ export function Header() {
 
     const clientes = proyectosVisibles
       .filter((proyecto) =>
-        [proyecto.razonSocial, proyecto.rut, proyecto.representanteLegal, proyecto.direccion]
+        [proyecto.cliente, proyecto.contactoPrincipal, proyecto.repositorio, proyecto.stackTecnico]
           .some((value) => value.toLowerCase().includes(normalizedQuery)),
       )
       .slice(0, 4);
@@ -178,7 +178,7 @@ export function Header() {
                             >
                               <div className="min-w-0">
                                 <p className="truncate text-sm font-semibold text-white">{proyecto.nombre}</p>
-                                <p className="truncate text-xs text-slate-400">{proyecto.razonSocial} · {proyecto.rut}</p>
+                                <p className="truncate text-xs text-slate-400">{proyecto.cliente} · {proyecto.categoria}</p>
                               </div>
                               <BriefcaseBusiness className="mt-0.5 h-4 w-4 shrink-0 text-slate-500" />
                             </button>
@@ -225,8 +225,8 @@ export function Header() {
                               onMouseDown={() => abrirCliente(proyecto.id)}
                             >
                               <div className="min-w-0">
-                                <p className="truncate text-sm font-semibold text-white">{proyecto.razonSocial}</p>
-                                <p className="truncate text-xs text-slate-400">{proyecto.nombre} · {proyecto.representanteLegal}</p>
+                                <p className="truncate text-sm font-semibold text-white">{proyecto.cliente}</p>
+                                <p className="truncate text-xs text-slate-400">{proyecto.nombre} · {proyecto.contactoPrincipal}</p>
                               </div>
                               <Building2 className="mt-0.5 h-4 w-4 shrink-0 text-slate-500" />
                             </button>

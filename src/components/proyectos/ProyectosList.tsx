@@ -42,7 +42,7 @@ export function ProyectosList() {
                 <div className="mb-5 flex items-start justify-between gap-4">
                   <button className="min-w-0 text-left" onClick={() => setVista('proyecto', proyecto.id)}>
                     <h2 className="truncate text-xl font-semibold text-white">{proyecto.nombre}</h2>
-                    <p className="mt-1 text-sm text-slate-500">RUT {proyecto.rut}</p>
+                    <p className="mt-1 text-sm text-slate-500">{proyecto.cliente}</p>
                   </button>
                   <div className="flex items-center gap-3">
                     <TrafficLightOrb estado={estado} size="md" />
@@ -59,7 +59,7 @@ export function ProyectosList() {
                     <CalendarDays className="h-4 w-4 text-slate-500" />
                     {proyecto.fechaInicio} a {proyecto.fechaGoLive}
                   </span>
-                  <span>Sistema origen: {proyecto.sistemaOrigen}</span>
+                  <span>Categoría: {proyecto.categoria}</span>
                 </div>
 
                 <div className="mt-auto">

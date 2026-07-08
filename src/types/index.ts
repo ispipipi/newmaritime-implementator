@@ -1,4 +1,4 @@
-export type SistemaOrigen = 'Visma' | 'Meta4' | 'Talana' | 'Workday' | 'BUK' | 'Otro';
+export type CategoriaProyecto = 'Demo' | 'Solución completa' | 'Corrección' | 'QA / Auditoría' | 'Handoff' | 'Otro';
 
 export type EstadoTarea = 'pendiente' | 'en_proceso' | 'completada' | 'bloqueada' | 'cancelada';
 
@@ -64,14 +64,12 @@ export interface Ejecutivo {
 export interface Proyecto {
   id: string;
   nombre: string;
-  rut: string;
-  razonSocial: string;
-  representanteLegal: string;
-  direccion: string;
-  cajaCompensacion: string;
-  mutualidad: string;
-  porcentajeCotizacionMutual: number;
-  sistemaOrigen: SistemaOrigen;
+  cliente: string;
+  contactoPrincipal: string;
+  repositorio: string;
+  urlProyecto: string;
+  stackTecnico: string;
+  categoria: CategoriaProyecto;
   ejecutivoId: string;
   supervisorId: string;
   fechaInicio: string;

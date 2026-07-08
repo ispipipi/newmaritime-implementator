@@ -1,5 +1,5 @@
-import { Ejecutivo, Proyecto } from '../types';
-import { GANTT_FRUTICOLA_FASES, GANTT_FRUTICOLA_SOURCE, GANTT_FRUTICOLA_TAREAS } from './ganttFruticola';
+import { Ejecutivo } from '../types';
+import { NEWMARITIME_FASES, NEWMARITIME_TAREAS, PROYECTO_NEWMARITIME } from './newMaritimeData';
 
 export const EJECUTIVOS_SEED: Ejecutivo[] = [
   {
@@ -19,6 +19,14 @@ export const EJECUTIVOS_SEED: Ejecutivo[] = [
     color: '#3b82f6',
   },
   {
+    id: 'milenko-id',
+    nombre: 'Milenko',
+    iniciales: 'ML',
+    rol: 'Co-fundador / Desarrollo',
+    perfil: 'artbpo_admin',
+    color: '#14b8a6',
+  },
+  {
     id: 'julissa-id',
     nombre: 'Julissa Espinoza',
     iniciales: 'JsE',
@@ -36,29 +44,9 @@ export const EJECUTIVOS_SEED: Ejecutivo[] = [
   },
 ];
 
-export const PROYECTO_AGRICHILE: Proyecto = {
-  id: 'agrichile-id',
-  nombre: 'Frutícola Agrichile S.A.',
-  rut: '96.618.010-2',
-  razonSocial: 'Frutícola Agrichile S.A.',
-  representanteLegal: 'Representante Legal Agrichile',
-  direccion: "Camino Agricola s/n, Region de O'Higgins",
-  cajaCompensacion: 'Los Andes',
-  mutualidad: 'ACHS',
-  porcentajeCotizacionMutual: 0.93,
-  sistemaOrigen: 'Visma',
-  ejecutivoId: 'julissa-id',
-  supervisorId: 'paulina-id',
-  fechaInicio: GANTT_FRUTICOLA_SOURCE.fechaInicio,
-  fechaGoLive: GANTT_FRUTICOLA_SOURCE.fechaFin,
-  estado: 'activo',
-  observaciones: `Cliente migración desde Visma. Planificacion cargada desde ${GANTT_FRUTICOLA_SOURCE.archivo}.`,
-  creadoEn: '2026-05-04T09:00:00Z',
-};
-
 export const SEED_DATA = {
   ejecutivos: EJECUTIVOS_SEED,
-  proyectos: [PROYECTO_AGRICHILE],
-  fases: GANTT_FRUTICOLA_FASES,
-  tareas: GANTT_FRUTICOLA_TAREAS,
+  proyectos: [PROYECTO_NEWMARITIME],
+  fases: NEWMARITIME_FASES,
+  tareas: NEWMARITIME_TAREAS,
 };

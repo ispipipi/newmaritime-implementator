@@ -40,7 +40,7 @@ export function Charts({ proyectos, tareas }: { proyectos: Proyecto[]; tareas: T
   }));
 
   const avance = proyectos.map((p) => ({
-    name: p.nombre.replace('Frutícola ', ''),
+    name: p.nombre,
     avance: calcPctProyecto(p.id, tareas),
     pendiente: tareas.filter((t) => t.proyectoId === p.id && t.estado === 'pendiente').length,
     proceso: tareas.filter((t) => t.proyectoId === p.id && t.estado === 'en_proceso').length,
