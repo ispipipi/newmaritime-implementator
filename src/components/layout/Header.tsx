@@ -1,4 +1,4 @@
-import { BriefcaseBusiness, Building2, CalendarRange, Languages, ListTodo, LogOut, Search, Settings, UserRound, X } from 'lucide-react';
+import { BriefcaseBusiness, Building2, CalendarRange, ListTodo, LogOut, Search, Settings, UserRound, X } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { usePermisos, useProyectosVisibles } from '../../hooks/usePermisos';
@@ -8,7 +8,7 @@ import { useT } from '../../i18n/useT';
 import { Breadcrumb } from './Breadcrumb';
 
 export function Header() {
-  const { usuarioActivo, setVista, setTareaActiva, setBusquedaTareas, tareas, fases, perfiles, ejecutivos, idioma, alternarIdioma } = useAppStore();
+  const { usuarioActivo, setVista, setTareaActiva, setBusquedaTareas, tareas, fases, perfiles, ejecutivos } = useAppStore();
   const t = useT();
   const { puedeAdministrar, puedeGestionarUsuarios, puedeVerGanttAdmin } = usePermisos();
   const proyectosVisibles = useProyectosVisibles();
@@ -269,16 +269,6 @@ export function Header() {
             </div>
 
             <div className="flex shrink-0 items-center gap-2">
-              <button
-                type="button"
-                className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-2.5 py-1.5 text-xs font-medium text-slate-300 hover:bg-white/8"
-                onClick={alternarIdioma}
-                aria-label={t('language_toggle')}
-                title={t('language_toggle')}
-              >
-                <Languages className="h-4 w-4" />
-                {idioma === 'es' ? 'ES' : 'EN'}
-              </button>
               {usuarioActivo ? (
                 <button
                   className="flex items-center gap-2 rounded-lg border border-white/10 py-1.5 pl-2 pr-2 text-sm text-slate-200 hover:bg-white/8 sm:pr-3"
