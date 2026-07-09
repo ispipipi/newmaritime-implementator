@@ -11,25 +11,9 @@ import { MisTareasView } from './components/tareas/MisTareasView';
 import { subscribeWorkspaceState } from './services/remoteState';
 import { demoMode } from './services/firebaseClient';
 import { useAppStore } from './store/useAppStore';
-import { TemaApp } from './types';
-
-const temaPorHoraChile = (): TemaApp => {
-  const horaChile = Number(
-    new Intl.DateTimeFormat('en-US', {
-      hour: '2-digit',
-      hour12: false,
-      hourCycle: 'h23',
-      timeZone: 'America/Santiago',
-    })
-      .formatToParts(new Date())
-      .find((part) => part.type === 'hour')?.value ?? '0',
-  );
-
-  return horaChile >= 7 && horaChile < 20 ? 'dia' : 'noche';
-};
 
 function App() {
-  const { vista, recalcularAlertas, tema, setTema, usuarioActivo, aplicarEstadoCompartido } = useAppStore();
+  const { vista, recalcularAlertas, tema, usuarioActivo, aplicarEstadoCompartido } = useAppStore();
 
   useEffect(() => {
     recalcularAlertas();
@@ -39,30 +23,6 @@ function App() {
     document.documentElement.dataset.theme = tema;
     document.documentElement.style.colorScheme = tema === 'dia' ? 'light' : 'dark';
   }, [tema]);
-
-  useEffect(() => {
-    const aplicarTemaHorario = () => {
-      const temaHorario = temaPorHoraChile();
-      if (useAppStore.getState().tema !== temaHorario) {
-        setTema(temaHorario);
-      }
-    };
-
-    aplicarTemaHorario();
-    const timer = window.setInterval(aplicarTemaHorario, 60 * 1000);
-    const aplicarAlVolver = () => {
-      if (!document.hidden) aplicarTemaHorario();
-    };
-
-    document.addEventListener('visibilitychange', aplicarAlVolver);
-    window.addEventListener('focus', aplicarTemaHorario);
-
-    return () => {
-      window.clearInterval(timer);
-      document.removeEventListener('visibilitychange', aplicarAlVolver);
-      window.removeEventListener('focus', aplicarTemaHorario);
-    };
-  }, [setTema]);
 
   useEffect(() => {
     if (demoMode) return undefined;

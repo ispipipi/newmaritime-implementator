@@ -156,7 +156,7 @@ export const useAppStore = create<AppState>()(
       filtroTareasVista: 'todas',
       ordenTareasVista: 'criticas',
       diasAnticipacionAlerta: 3,
-      tema: 'noche',
+      tema: 'dia',
       fuenteGoogleSheetsUrl: GOOGLE_SHEETS_GANTT_URL,
       sincronizadoRemotoEn: undefined,
 
