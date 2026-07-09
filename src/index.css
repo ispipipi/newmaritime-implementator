@@ -121,19 +121,32 @@ html[data-theme='dia'] .text-emerald-400 {
   color: #065f46 !important;
 }
 
+html[data-theme='dia'] .text-blue-100,
 html[data-theme='dia'] .text-blue-200 {
   color: #1d4ed8 !important;
 }
 
+html[data-theme='dia'] .text-amber-50,
 html[data-theme='dia'] .text-amber-100,
 html[data-theme='dia'] .text-amber-200,
 html[data-theme='dia'] .text-amber-300,
 html[data-theme='dia'] .text-amber-400,
+html[data-theme='dia'] .text-amber-500,
+html[data-theme='dia'] .text-yellow-50,
 html[data-theme='dia'] .text-yellow-100,
 html[data-theme='dia'] .text-yellow-200,
 html[data-theme='dia'] .text-yellow-300,
-html[data-theme='dia'] .text-yellow-400 {
+html[data-theme='dia'] .text-yellow-400,
+html[data-theme='dia'] .text-yellow-500 {
   color: #92400e !important;
+}
+
+html[data-theme='dia'] .text-orange-50,
+html[data-theme='dia'] .text-orange-100,
+html[data-theme='dia'] .text-orange-200,
+html[data-theme='dia'] .text-orange-300,
+html[data-theme='dia'] .text-orange-400 {
+  color: #9a3412 !important;
 }
 
 html[data-theme='dia'] .border-amber-300\/20,
