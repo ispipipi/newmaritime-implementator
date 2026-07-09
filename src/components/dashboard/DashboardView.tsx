@@ -242,13 +242,8 @@ export function DashboardView() {
           <GlassCard className="overflow-hidden p-6 sm:p-8">
             <div className="grid gap-8 lg:grid-cols-[1fr_220px] lg:items-center">
               <div>
-                <p className="text-sm uppercase tracking-[0.18em] text-emerald-300">Monitoreo de implementaciones</p>
-                <h1 className="mt-3 max-w-3xl text-3xl font-semibold tracking-normal text-white sm:text-5xl">
-                  IMPLEMENTATOR controla avance, riesgos y go live en una sola vista.
-                </h1>
-                <p className="mt-4 max-w-2xl text-slate-400">
-                  artBPO puede navegar desde el portafolio hasta cada fase y tarea, con alertas calculadas desde las fechas planificadas.
-                </p>
+                <h1 className="text-3xl font-semibold tracking-normal text-white sm:text-5xl">IMPLEMENTATOR</h1>
+                <p className="mt-2 text-sm text-slate-400">The ultimate project control</p>
                 <div className="mt-6 flex flex-wrap gap-3">
                   <button className="inline-flex items-center gap-2 rounded-lg bg-emerald-400 px-4 py-2 font-semibold text-slate-950 hover:bg-emerald-300" onClick={abrirProyectos}>
                     Ver proyectos
