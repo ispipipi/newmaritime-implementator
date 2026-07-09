@@ -1,7 +1,7 @@
 import { AlertTriangle, Building2, CalendarDays, Edit3, FolderArchive, LayoutGrid, ListChecks, TimerReset } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { usePermisos } from '../../hooks/usePermisos';
-import { useAppStore, calcCumplimientoGanttProyecto, calcPctPlanificadoProyecto, calcPctProyecto, semaforoCumplimientoProyecto } from '../../store/useAppStore';
+import { useAppStore, calcCumplimientoGanttProyecto, calcPctProyecto, semaforoCumplimientoProyecto } from '../../store/useAppStore';
 import { Proyecto } from '../../types';
 import { getClientInfo } from '../../utils/clientInfo';
 import { AlertPanel } from '../layout/AlertPanel';
@@ -46,7 +46,6 @@ export function ProyectoDetail() {
 
   const pct = calcPctProyecto(proyecto.id, tareas);
   const cumplimiento = calcCumplimientoGanttProyecto(proyecto.id, tareas);
-  const planificado = calcPctPlanificadoProyecto(proyecto.id, tareas);
   const estado = semaforoCumplimientoProyecto(proyecto.id, tareas);
   const info = getClientInfo(proyecto);
 
@@ -55,18 +54,16 @@ export function ProyectoDetail() {
       <GlassCard className="p-6">
         <div className="grid gap-6 lg:grid-cols-[1fr_160px] lg:items-center">
           <div>
-            <div className="mb-4 flex flex-wrap items-center gap-3">
-              <TrafficLightOrb estado={estado} size="md" label={`Gantt ${cumplimiento}%`} />
-              <span className="rounded-full bg-white/8 px-3 py-1 text-sm text-slate-300">{proyecto.categoria}</span>
-              <span className="rounded-full bg-white/8 px-3 py-1 text-sm text-slate-300">{proyecto.estado}</span>
-              <span className="rounded-full bg-white/8 px-3 py-1 text-sm text-slate-300">Plan a hoy {planificado}%</span>
+            <div className="mb-2 flex items-center gap-2">
+              <TrafficLightOrb estado={estado} size="sm" />
+              <p className="text-sm text-slate-400">{info.cliente}</p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
               <h1 className="text-3xl font-semibold text-white">{proyecto.nombre}</h1>
               {puedeEditarProyectos ? (
                 <button className="inline-flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-200 hover:bg-white/8" onClick={() => setEditing(proyecto)}>
                   <Edit3 className="h-4 w-4" />
-                  Editar proyecto
+                  Editar
                 </button>
               ) : null}
               <button className="inline-flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-200 hover:bg-white/8" onClick={() => setVista('info_cliente', proyecto.id)}>
@@ -74,24 +71,22 @@ export function ProyectoDetail() {
                 Info cliente
               </button>
             </div>
-            <p className="mt-2 max-w-3xl text-slate-400">{proyecto.observaciones}</p>
-            <div className="mt-5 flex flex-wrap gap-4 text-sm text-slate-300">
+            <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-slate-300">
               <span className="inline-flex items-center gap-2">
                 <CalendarDays className="h-4 w-4 text-slate-500" />
                 {proyecto.fechaInicio} a {proyecto.fechaGoLive}
               </span>
-              <span>Cliente: {info.cliente}</span>
-              <span>Stack: {info.stackTecnico}</span>
+              <span className="rounded-full bg-white/8 px-3 py-1 text-xs text-slate-300">{proyecto.estado}</span>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4 justify-self-start text-center lg:justify-self-end">
             <div>
               <ProgressRing value={cumplimiento} size={112} />
-              <p className="mt-2 text-xs text-slate-400">Cumplimiento Gantt</p>
+              <p className="mt-2 text-xs text-slate-400">Gantt</p>
             </div>
             <div>
               <ProgressRing value={pct} size={112} />
-              <p className="mt-2 text-xs text-slate-400">% avance real</p>
+              <p className="mt-2 text-xs text-slate-400">Real</p>
             </div>
           </div>
         </div>
