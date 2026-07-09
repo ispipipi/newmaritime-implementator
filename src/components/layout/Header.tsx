@@ -1,13 +1,15 @@
-import { BriefcaseBusiness, Building2, CalendarRange, ListTodo, LogOut, Search, Settings, UserRound, X } from 'lucide-react';
+import { BriefcaseBusiness, Building2, CalendarRange, Languages, ListTodo, LogOut, Search, Settings, UserRound, X } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { usePermisos, useProyectosVisibles } from '../../hooks/usePermisos';
 import { auth, demoMode } from '../../services/firebaseClient';
 import { useAppStore } from '../../store/useAppStore';
+import { useT } from '../../i18n/useT';
 import { Breadcrumb } from './Breadcrumb';
 
 export function Header() {
-  const { usuarioActivo, setVista, setTareaActiva, setBusquedaTareas, tareas, fases, perfiles, ejecutivos } = useAppStore();
+  const { usuarioActivo, setVista, setTareaActiva, setBusquedaTareas, tareas, fases, perfiles, ejecutivos, idioma, alternarIdioma } = useAppStore();
+  const t = useT();
   const { puedeAdministrar, puedeGestionarUsuarios, puedeVerGanttAdmin } = usePermisos();
   const proyectosVisibles = useProyectosVisibles();
   const [query, setQuery] = useState('');
@@ -131,7 +133,7 @@ export function Header() {
             </div>
             <div className="min-w-0 text-left">
               <p className="truncate text-base font-semibold text-white sm:text-lg">IMPLEMENTATOR</p>
-              <p className="text-xs text-slate-500">NPR Project Tracking</p>
+              <p className="text-xs text-slate-500">{t('app_tagline')}</p>
             </div>
           </button>
 
@@ -141,7 +143,7 @@ export function Header() {
                 <Search className="h-4 w-4 shrink-0 text-slate-500" />
                 <input
                   className="w-full bg-transparent text-sm text-white outline-none placeholder:text-slate-500"
-                  placeholder="Buscar proyecto, tarea, cliente o responsable"
+                  placeholder={t('search_placeholder')}
                   value={query}
                   onChange={(event) => {
                     setQuery(event.target.value);
@@ -267,6 +269,16 @@ export function Header() {
             </div>
 
             <div className="flex shrink-0 items-center gap-2">
+              <button
+                type="button"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-2.5 py-1.5 text-xs font-medium text-slate-300 hover:bg-white/8"
+                onClick={alternarIdioma}
+                aria-label={t('language_toggle')}
+                title={t('language_toggle')}
+              >
+                <Languages className="h-4 w-4" />
+                {idioma === 'es' ? 'ES' : 'EN'}
+              </button>
               {usuarioActivo ? (
                 <button
                   className="flex items-center gap-2 rounded-lg border border-white/10 py-1.5 pl-2 pr-2 text-sm text-slate-200 hover:bg-white/8 sm:pr-3"
@@ -289,26 +301,26 @@ export function Header() {
         <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin">
             <button className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-300 hover:bg-white/8" onClick={() => setVista('proyectos')}>
               <BriefcaseBusiness className="h-4 w-4" />
-              Proyectos
+              {t('nav_proyectos')}
             </button>
             <button className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-300 hover:bg-white/8" onClick={() => setVista('mis_tareas')}>
               <ListTodo className="h-4 w-4" />
-              Mis tareas
+              {t('nav_mis_tareas')}
             </button>
             <button className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-300 hover:bg-white/8" onClick={() => setVista('info_cliente')}>
               <Building2 className="h-4 w-4" />
-              Info cliente
+              {t('nav_info_cliente')}
             </button>
             {puedeVerGanttAdmin || puedeGestionarUsuarios || puedeAdministrar ? (
               <>
                 {puedeVerGanttAdmin ? (
                   <button className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-300 hover:bg-white/8" onClick={() => setVista('gantt_admin')}>
                     <CalendarRange className="h-4 w-4" />
-                    Gantt admin
+                    {t('nav_gantt_admin')}
                   </button>
                 ) : null}
                 {puedeGestionarUsuarios || puedeAdministrar ? (
-                  <button className="shrink-0 rounded-lg border border-white/10 p-2 text-slate-300 hover:bg-white/8" onClick={() => setVista('ajustes')} aria-label="Ajustes">
+                  <button className="shrink-0 rounded-lg border border-white/10 p-2 text-slate-300 hover:bg-white/8" onClick={() => setVista('ajustes')} aria-label={t('nav_ajustes')}>
                     <Settings className="h-5 w-5" />
                   </button>
                 ) : null}

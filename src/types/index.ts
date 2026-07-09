@@ -9,6 +9,7 @@ export type PerfilApp = 'artbpo_admin' | 'artbpo_ejecutivo';
 export type PerfilUsuario = string;
 
 export type TemaApp = 'dia' | 'noche';
+export type Idioma = 'es' | 'en';
 export type FiltroTareasVista =
   | 'todas'
   | 'vencidas'
@@ -217,6 +218,7 @@ export interface AppState {
   ordenTareasVista: OrdenTareasVista;
   diasAnticipacionAlerta: number;
   tema: TemaApp;
+  idioma: Idioma;
   fuenteGoogleSheetsUrl: string;
   sincronizadoRemotoEn?: string;
   setUsuarioActivo: (u: UsuarioActivo | null) => void;
@@ -227,6 +229,8 @@ export interface AppState {
   setOrdenTareasVista: (value: OrdenTareasVista) => void;
   setTema: (tema: TemaApp) => void;
   alternarTema: () => void;
+  setIdioma: (idioma: Idioma) => void;
+  alternarIdioma: () => void;
   setFuenteGoogleSheetsUrl: (url: string) => void;
   aplicarEstadoCompartido: (estado: Partial<Pick<AppState, 'perfiles' | 'perfilesAcceso' | 'ejecutivos' | 'proyectos' | 'fases' | 'tareas' | 'alertas' | 'expedientes' | 'diasAnticipacionAlerta' | 'fuenteGoogleSheetsUrl'>>) => void;
   crearPerfil: (perfil: Omit<UsuarioActivo, 'id'>) => void;

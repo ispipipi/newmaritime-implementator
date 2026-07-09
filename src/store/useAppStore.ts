@@ -157,6 +157,7 @@ export const useAppStore = create<AppState>()(
       ordenTareasVista: 'criticas',
       diasAnticipacionAlerta: 3,
       tema: 'dia',
+      idioma: 'es',
       fuenteGoogleSheetsUrl: GOOGLE_SHEETS_GANTT_URL,
       sincronizadoRemotoEn: undefined,
 
@@ -176,6 +177,10 @@ export const useAppStore = create<AppState>()(
       setTema: (tema) => set({ tema }),
 
       alternarTema: () => set((s) => ({ tema: s.tema === 'noche' ? 'dia' : 'noche' })),
+
+      setIdioma: (idioma) => set({ idioma }),
+
+      alternarIdioma: () => set((s) => ({ idioma: s.idioma === 'es' ? 'en' : 'es' })),
 
       setFuenteGoogleSheetsUrl: (url) => {
         set({ fuenteGoogleSheetsUrl: url });

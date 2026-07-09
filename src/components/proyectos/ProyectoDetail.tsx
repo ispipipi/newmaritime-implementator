@@ -152,7 +152,7 @@ export function ProyectoDetail() {
         </div>
       ) : null}
 
-      {tab === 'gantt' ? <GanttView tareas={tareasFase} /> : null}
+      {tab === 'gantt' ? <GanttView fases={faseActiva ? [faseActiva] : fasesProyecto} tareas={tareasFase} /> : null}
       {tab === 'expediente' ? <ProyectoExpediente proyectoId={proyecto.id} /> : null}
       {tab === 'alertas' ? <AlertPanel /> : null}
       <ProyectoEditDrawer proyecto={editing} onClose={() => setEditing(null)} />

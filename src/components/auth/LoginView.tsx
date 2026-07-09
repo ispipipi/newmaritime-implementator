@@ -6,6 +6,7 @@ import { UsuarioActivo } from '../../types';
 import { auth, demoMode, firebaseMissingMessage, firebaseReady } from '../../services/firebaseClient';
 import { ensureWorkspaceState, loadWorkspaceState } from '../../services/remoteState';
 import { enviarRecuperacionPassword } from '../../services/userAccess';
+import { useT } from '../../i18n/useT';
 import { GlassCard } from '../ui/GlassCard';
 
 const normalizarEmail = (email?: string | null) => (email ?? '').trim().toLowerCase();
@@ -15,6 +16,7 @@ const buscarPerfil = (perfiles: UsuarioActivo[], email: string) =>
 
 export function LoginView() {
   const { perfiles, usuarioActivo, setUsuarioActivo, aplicarEstadoCompartido } = useAppStore();
+  const t = useT();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [cargando, setCargando] = useState(false);
@@ -56,7 +58,7 @@ export function LoginView() {
         const perfil = buscarPerfil(perfilesDisponibles, emailUsuario);
 
         if (!perfil) {
-          setMensaje('Tu usuario existe en Firebase, pero aun no tiene perfil asignado en IMPLEMENTATOR.');
+          setMensaje(t('login_no_profile'));
           setSinPerfil(true);
           setUsuarioActivo(null);
           return;
@@ -64,12 +66,13 @@ export function LoginView() {
 
         setUsuarioActivo({ ...perfil, email: emailUsuario });
       } catch (error) {
-        setMensaje(error instanceof Error ? error.message : 'No se pudo cargar el perfil.');
+        setMensaje(error instanceof Error ? error.message : t('login_profile_load_error'));
         setUsuarioActivo(null);
       } finally {
         setCargando(false);
       }
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [aplicarEstadoCompartido, setUsuarioActivo]);
 
   if (usuarioActivo) return null;
@@ -83,7 +86,7 @@ export function LoginView() {
     try {
       await signInWithEmailAndPassword(auth, email.trim(), password);
     } catch {
-      setMensaje('Email o contrasena incorrecta, o el usuario aun no existe en Firebase.');
+      setMensaje(t('login_bad_credentials'));
     } finally {
       setCargando(false);
     }
@@ -94,7 +97,7 @@ export function LoginView() {
     setTipoMensaje('error');
 
     if (!email.trim()) {
-      setMensaje('Ingresa tu email y luego presiona crear nueva contrasena.');
+      setMensaje(t('login_enter_email_first'));
       return;
     }
 
@@ -102,9 +105,9 @@ export function LoginView() {
     try {
       await enviarRecuperacionPassword(email);
       setTipoMensaje('ok');
-      setMensaje('Te enviamos un correo para crear una nueva contrasena. Por seguridad no se puede enviar la contrasena actual.');
+      setMensaje(t('login_recovery_sent'));
     } catch (error) {
-      setMensaje(error instanceof Error ? error.message : 'No se pudo enviar el correo de recuperacion.');
+      setMensaje(error instanceof Error ? error.message : t('login_recovery_error'));
     } finally {
       setRecuperando(false);
     }
@@ -118,8 +121,8 @@ export function LoginView() {
             <ShieldCheck className="h-6 w-6" />
           </div>
           <p className="text-sm uppercase tracking-[0.18em] text-emerald-300">IMPLEMENTATOR</p>
-          <h1 className="mt-2 text-2xl font-semibold text-white">Ingreso seguro</h1>
-          <p className="mt-2 text-sm text-slate-400">Accede con tu email y contrasena asignada.</p>
+          <h1 className="mt-2 text-2xl font-semibold text-white">{t('login_title')}</h1>
+          <p className="mt-2 text-sm text-slate-400">{t('login_subtitle')}</p>
         </div>
 
         {!firebaseReady ? (
@@ -129,7 +132,7 @@ export function LoginView() {
         ) : (
           <form className="space-y-3" onSubmit={submit}>
             <label className="block text-sm text-slate-300">
-              Email
+              {t('login_email')}
               <input
                 className="mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white outline-none focus:border-emerald-300/50"
                 type="email"
@@ -140,7 +143,7 @@ export function LoginView() {
               />
             </label>
             <label className="block text-sm text-slate-300">
-              Contrasena
+              {t('login_password')}
               <input
                 className="mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white outline-none focus:border-emerald-300/50"
                 type="password"
@@ -168,7 +171,7 @@ export function LoginView() {
                 onClick={() => auth && signOut(auth)}
               >
                 <LogOut className="h-4 w-4" />
-                Cerrar sesión e intentar con otro usuario
+                {t('login_signout_stuck')}
               </button>
             ) : null}
             <button
@@ -176,7 +179,7 @@ export function LoginView() {
               disabled={cargando}
             >
               <LockKeyhole className="h-4 w-4" />
-              {cargando ? 'Ingresando...' : 'Ingresar'}
+              {cargando ? t('login_loading') : t('login_button')}
             </button>
             <button
               type="button"
@@ -184,7 +187,7 @@ export function LoginView() {
               disabled={recuperando}
               onClick={recuperarPassword}
             >
-              {recuperando ? 'Enviando correo...' : 'Crear nueva contrasena'}
+              {recuperando ? t('login_sending') : t('login_forgot')}
             </button>
           </form>
         )}

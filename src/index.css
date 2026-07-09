@@ -322,6 +322,26 @@ html[data-theme='dia'] .gantt .bar-label {
   fill: #f59e0b;
 }
 
+.gantt .bar.fase-row .bar {
+  fill: rgba(139, 92, 246, 0.22);
+  stroke: #8b5cf6;
+  stroke-width: 1.4;
+  cursor: pointer;
+}
+
+.gantt .bar.fase-row .bar-progress {
+  fill: #8b5cf6;
+}
+
+.gantt .bar.fase-row .bar-label {
+  font-weight: 600;
+  fill: #f8fafc;
+}
+
+html[data-theme='dia'] .gantt .bar.fase-row .bar-label {
+  fill: #3c3489;
+}
+
 .popup-wrapper {
   background: #111827 !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;

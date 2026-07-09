@@ -5,6 +5,7 @@ import { usePermisos } from '../../hooks/usePermisos';
 import { useAppStore } from '../../store/useAppStore';
 import { EstadoTarea, Tarea } from '../../types';
 import { GoogleSheetPlanPayload, GoogleSheetPlanRow, normalizeGoogleSheetSourceUrl, parseGoogleSheetCsv, parseGoogleSheetPlan } from '../../utils/googleSheetsPlan';
+import { useT } from '../../i18n/useT';
 import { GanttView } from './GanttView';
 import { GlassCard } from '../ui/GlassCard';
 import { StatusBadge } from '../ui/StatusBadge';
@@ -30,6 +31,7 @@ export function GanttAdminView() {
     desplazarCronogramaProyecto,
   } = useAppStore();
   const { puedeAdministrar } = usePermisos();
+  const t = useT();
   const [proyectoId, setProyectoId] = useState(proyectos[0]?.id ?? '');
   const [sheetUrl, setSheetUrl] = useState(fuenteGoogleSheetsUrl);
   const [syncState, setSyncState] = useState<{ loading: boolean; message: string; error: boolean }>({ loading: false, message: '', error: false });
@@ -176,9 +178,9 @@ export function GanttAdminView() {
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-sm uppercase tracking-[0.18em] text-emerald-300">Administracion</p>
-          <h1 className="mt-2 text-3xl font-semibold text-white">Gantt completa</h1>
-          <p className="mt-2 text-slate-400">Vista de administrador para ajustar fechas, estados, responsables y estructura de tareas.</p>
+          <p className="text-sm uppercase tracking-[0.18em] text-emerald-300">{t('gantt_admin_badge')}</p>
+          <h1 className="mt-2 text-3xl font-semibold text-white">{t('gantt_admin_title')}</h1>
+          <p className="mt-2 text-slate-400">{t('gantt_admin_subtitle')}</p>
         </div>
         <select className="min-w-72 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white" value={proyectoId} onChange={(e) => setProyectoId(e.target.value)}>
           {proyectos.map((p) => (
@@ -231,12 +233,12 @@ export function GanttAdminView() {
               <Cloud className="h-4 w-4" />
               Fuente viva
             </div>
-            <h2 className="text-xl font-semibold text-white">Sincronizar desde Google Sheets</h2>
+            <h2 className="text-xl font-semibold text-white">{t('gantt_sync_title')}</h2>
             <p className="mt-1 text-sm text-slate-500">
-              Pega la URL del Google Sheet compartido o del Apps Script. Al sincronizar, se reemplazan fases y tareas del proyecto seleccionado.
+              {t('gantt_sync_subtitle')}
             </p>
             <label className="mt-4 grid gap-2 text-sm text-slate-300">
-              URL del Apps Script
+              {t('gantt_sync_url_label')}
               <div className="flex flex-col gap-2 sm:flex-row">
                 <div className="relative flex-1">
                   <Link2 className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
@@ -248,7 +250,7 @@ export function GanttAdminView() {
                   />
                 </div>
                 <button type="button" className="rounded-lg border border-white/10 px-4 py-2 text-sm font-medium text-slate-200 hover:bg-white/8" onClick={saveSheetUrl}>
-                  Guardar URL
+                  {t('gantt_sync_save_url')}
                 </button>
               </div>
             </label>
@@ -263,15 +265,15 @@ export function GanttAdminView() {
             disabled={syncState.loading}
           >
             <RefreshCw className={`h-4 w-4 ${syncState.loading ? 'animate-spin' : ''}`} />
-            Sincronizar
+            {t('gantt_sync_button')}
           </button>
         </div>
       </GlassCard>
 
-      <GanttView tareas={tareasProyecto} />
+      <GanttView fases={fasesProyecto} tareas={tareasProyecto} />
 
       <GlassCard className="p-5">
-        <h2 className="mb-4 text-xl font-semibold text-white">Agregar tarea</h2>
+        <h2 className="mb-4 text-xl font-semibold text-white">{t('gantt_add_task_title')}</h2>
         <form className="grid gap-3 lg:grid-cols-6" onSubmit={submit}>
           <select className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white" value={currentFaseId} onChange={(e) => setForm((s) => ({ ...s, faseId: e.target.value }))}>
             {fasesProyecto.map((fase) => (
@@ -280,8 +282,8 @@ export function GanttAdminView() {
               </option>
             ))}
           </select>
-          <input className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white lg:col-span-2" placeholder="Nombre de tarea" value={form.nombre} onChange={(e) => setForm((s) => ({ ...s, nombre: e.target.value }))} />
-          <input className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white" placeholder="Responsable" value={form.responsable} onChange={(e) => setForm((s) => ({ ...s, responsable: e.target.value }))} />
+          <input className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white lg:col-span-2" placeholder={t('gantt_add_task_nombre')} value={form.nombre} onChange={(e) => setForm((s) => ({ ...s, nombre: e.target.value }))} />
+          <input className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white" placeholder={t('gantt_add_task_responsable')} value={form.responsable} onChange={(e) => setForm((s) => ({ ...s, responsable: e.target.value }))} />
           <input type="date" className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white" value={form.fechaInicioPlan} onChange={(e) => setForm((s) => ({ ...s, fechaInicioPlan: e.target.value }))} />
           <input type="date" className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white" value={form.fechaFinPlan} onChange={(e) => setForm((s) => ({ ...s, fechaFinPlan: e.target.value }))} />
           <select className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white" value={form.estado} onChange={(e) => setForm((s) => ({ ...s, estado: e.target.value as EstadoTarea }))}>
@@ -293,32 +295,32 @@ export function GanttAdminView() {
           </select>
           <label className="inline-flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-300">
             <input type="checkbox" checked={form.esMilestone} onChange={(e) => setForm((s) => ({ ...s, esMilestone: e.target.checked }))} />
-            Milestone
+            {t('gantt_milestone_label')}
           </label>
           <button className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-400 px-4 py-2 font-semibold text-slate-950 hover:bg-emerald-300">
             <Plus className="h-4 w-4" />
-            Agregar
+            {t('gantt_add_task_button')}
           </button>
         </form>
       </GlassCard>
 
       <GlassCard className="overflow-hidden">
         <div className="border-b border-white/10 p-5">
-          <h2 className="text-xl font-semibold text-white">Editar tareas</h2>
-          <p className="mt-1 text-sm text-slate-500">Los cambios se guardan al modificar cada campo.</p>
+          <h2 className="text-xl font-semibold text-white">{t('gantt_edit_title')}</h2>
+          <p className="mt-1 text-sm text-slate-500">{t('gantt_edit_subtitle')}</p>
         </div>
         <div className="overflow-x-auto scrollbar-thin">
           <table className="min-w-[1180px] w-full text-left">
             <thead className="bg-white/[0.035] text-xs uppercase tracking-[0.14em] text-slate-500">
               <tr>
-                <th className="px-4 py-3">Tarea</th>
-                <th className="px-4 py-3">Fase</th>
-                <th className="px-4 py-3">Responsable</th>
-                <th className="px-4 py-3">Estado</th>
-                <th className="px-4 py-3">Inicio</th>
-                <th className="px-4 py-3">Fin</th>
-                <th className="px-4 py-3">Milestone</th>
-                <th className="px-4 py-3 text-right">Eliminar</th>
+                <th className="px-4 py-3">{t('gantt_col_tarea')}</th>
+                <th className="px-4 py-3">{t('gantt_col_fase')}</th>
+                <th className="px-4 py-3">{t('gantt_col_responsable')}</th>
+                <th className="px-4 py-3">{t('gantt_col_estado')}</th>
+                <th className="px-4 py-3">{t('gantt_col_inicio')}</th>
+                <th className="px-4 py-3">{t('gantt_col_fin')}</th>
+                <th className="px-4 py-3">{t('gantt_col_milestone')}</th>
+                <th className="px-4 py-3 text-right">{t('gantt_col_eliminar')}</th>
               </tr>
             </thead>
             <tbody>
@@ -360,13 +362,13 @@ export function GanttAdminView() {
                   <td className="px-4 py-3">
                     <label className="inline-flex items-center gap-2 text-sm text-slate-300">
                       <input type="checkbox" checked={tarea.esMilestone} onChange={(e) => updateTask(tarea, { esMilestone: e.target.checked })} />
-                      Si
+                      {t('gantt_milestone_si')}
                     </label>
                   </td>
                   <td className="px-4 py-3 text-right">
                     <button className="inline-flex items-center gap-2 rounded-lg border border-red-400/20 px-3 py-2 text-sm text-red-300 hover:bg-red-500/10" onClick={() => deleteTask(tarea)}>
                       <Trash2 className="h-4 w-4" />
-                      Eliminar
+                      {t('gantt_col_eliminar')}
                     </button>
                   </td>
                 </tr>
