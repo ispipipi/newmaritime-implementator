@@ -18,7 +18,7 @@ export const PERFILES_SEED: UsuarioActivo[] = [
     rol: 'Administrador',
     perfil: 'artbpo_admin',
     color: '#3b82f6',
-    email: '',
+    email: 'boss@npr.cl',
     activo: true,
   },
   {
