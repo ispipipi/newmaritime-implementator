@@ -49,7 +49,7 @@ export async function ensureWorkspaceState(state: AppState) {
   const snapshot = await getDoc(ref);
   if (!snapshot.exists()) {
     await setDoc(ref, {
-      ...toSharedState(state),
+      ...removeUndefined(toSharedState(state)),
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       updatedBy: state.usuarioActivo?.email ?? state.usuarioActivo?.nombre ?? 'Sistema',
