@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useState } from 'react';
-import { onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
-import { LockKeyhole, ShieldCheck } from 'lucide-react';
+import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { LockKeyhole, LogOut, ShieldCheck } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
 import { UsuarioActivo } from '../../types';
 import { auth, firebaseMissingMessage, firebaseReady } from '../../services/firebaseClient';
@@ -21,6 +21,7 @@ export function LoginView() {
   const [recuperando, setRecuperando] = useState(false);
   const [mensaje, setMensaje] = useState('');
   const [tipoMensaje, setTipoMensaje] = useState<'error' | 'ok'>('error');
+  const [sinPerfil, setSinPerfil] = useState(false);
 
   useEffect(() => {
     if (!auth) return undefined;
@@ -34,6 +35,7 @@ export function LoginView() {
       setCargando(true);
       setMensaje('');
       setTipoMensaje('error');
+      setSinPerfil(false);
 
       try {
         await ensureWorkspaceState(useAppStore.getState());
@@ -46,6 +48,7 @@ export function LoginView() {
 
         if (!perfil) {
           setMensaje('Tu usuario existe en Firebase, pero aun no tiene perfil asignado en IMPLEMENTATOR.');
+          setSinPerfil(true);
           setUsuarioActivo(null);
           return;
         }
@@ -148,6 +151,16 @@ export function LoginView() {
               >
                 {mensaje}
               </p>
+            ) : null}
+            {sinPerfil ? (
+              <button
+                type="button"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-white/10 px-4 py-2 text-sm font-medium text-slate-300 hover:bg-white/5"
+                onClick={() => auth && signOut(auth)}
+              >
+                <LogOut className="h-4 w-4" />
+                Cerrar sesión e intentar con otro usuario
+              </button>
             ) : null}
             <button
               className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-400 px-4 py-2.5 font-semibold text-slate-950 hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-60"
