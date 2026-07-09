@@ -23,3 +23,5 @@ export const db = firebaseApp ? getFirestore(firebaseApp) : null;
 
 export const firebaseMissingMessage =
   'Firebase no esta configurado. Agrega las variables VITE_FIREBASE_* en GitHub Pages y en tu archivo .env local.';
+
+export const demoMode = import.meta.env.VITE_DEMO_MODE === 'true';

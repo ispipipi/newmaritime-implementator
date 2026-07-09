@@ -3,7 +3,7 @@ import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebas
 import { LockKeyhole, LogOut, ShieldCheck } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
 import { UsuarioActivo } from '../../types';
-import { auth, firebaseMissingMessage, firebaseReady } from '../../services/firebaseClient';
+import { auth, demoMode, firebaseMissingMessage, firebaseReady } from '../../services/firebaseClient';
 import { ensureWorkspaceState, loadWorkspaceState } from '../../services/remoteState';
 import { enviarRecuperacionPassword } from '../../services/userAccess';
 import { GlassCard } from '../ui/GlassCard';
@@ -24,6 +24,15 @@ export function LoginView() {
   const [sinPerfil, setSinPerfil] = useState(false);
 
   useEffect(() => {
+    if (!demoMode) return;
+    if (usuarioActivo) return;
+    const admin = perfiles.find((p) => p.perfil === 'artbpo_admin') ?? perfiles[0] ?? null;
+    if (admin) setUsuarioActivo(admin);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [demoMode]);
+
+  useEffect(() => {
+    if (demoMode) return undefined;
     if (!auth) return undefined;
 
     return onAuthStateChanged(auth, async (firebaseUser) => {

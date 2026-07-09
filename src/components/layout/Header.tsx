@@ -2,7 +2,7 @@ import { BriefcaseBusiness, Building2, CalendarRange, ListTodo, LogOut, Search, 
 import { signOut } from 'firebase/auth';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { usePermisos, useProyectosVisibles } from '../../hooks/usePermisos';
-import { auth } from '../../services/firebaseClient';
+import { auth, demoMode } from '../../services/firebaseClient';
 import { useAppStore } from '../../store/useAppStore';
 import { Breadcrumb } from './Breadcrumb';
 
@@ -118,6 +118,11 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-30 border-b border-white/10 bg-[#0f1117]/78 backdrop-blur-xl">
+      {demoMode ? (
+        <div className="bg-amber-400/90 px-3 py-1.5 text-center text-xs font-semibold text-amber-950">
+          Modo demo — sin autenticación. Cualquiera con este link puede ver los datos. Desactivar quitando VITE_DEMO_MODE.
+        </div>
+      ) : null}
       <div className="mx-auto flex max-w-7xl flex-col gap-3 px-3 py-3 sm:gap-4 sm:px-6 sm:py-4 lg:px-8">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <button className="flex min-w-0 items-center gap-3" onClick={() => setVista('dashboard')}>
@@ -126,7 +131,7 @@ export function Header() {
             </div>
             <div className="min-w-0 text-left">
               <p className="truncate text-base font-semibold text-white sm:text-lg">IMPLEMENTATOR</p>
-              <p className="text-xs text-slate-500">artBPO Software Implementation</p>
+              <p className="text-xs text-slate-500">NPR Project Tracking</p>
             </div>
           </button>
 

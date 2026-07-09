@@ -9,6 +9,7 @@ import { ProyectoDetail } from './components/proyectos/ProyectoDetail';
 import { ProyectosList } from './components/proyectos/ProyectosList';
 import { MisTareasView } from './components/tareas/MisTareasView';
 import { subscribeWorkspaceState } from './services/remoteState';
+import { demoMode } from './services/firebaseClient';
 import { useAppStore } from './store/useAppStore';
 import { TemaApp } from './types';
 
@@ -64,6 +65,7 @@ function App() {
   }, [setTema]);
 
   useEffect(() => {
+    if (demoMode) return undefined;
     if (!usuarioActivo) return undefined;
     return subscribeWorkspaceState((estado) => aplicarEstadoCompartido(estado), (error) => console.warn(error));
   }, [aplicarEstadoCompartido, usuarioActivo]);
