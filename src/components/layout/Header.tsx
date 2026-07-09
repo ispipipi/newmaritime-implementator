@@ -1,4 +1,4 @@
-import { BriefcaseBusiness, Building2, CalendarRange, ListTodo, LogOut, Search, Settings, UserRound, X } from 'lucide-react';
+import { BriefcaseBusiness, Building2, CalendarRange, ListTodo, LogOut, Moon, Search, Settings, Sun, UserRound, X } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { usePermisos, useProyectosVisibles } from '../../hooks/usePermisos';
@@ -7,8 +7,11 @@ import { useAppStore } from '../../store/useAppStore';
 import { useT } from '../../i18n/useT';
 import { Breadcrumb } from './Breadcrumb';
 
+// Ocultos temporalmente a pedido de Julio (08/07/2026) — volver a activar cuando se retomen estos menus.
+const MOSTRAR_AJUSTES = false;
+
 export function Header() {
-  const { usuarioActivo, setVista, setTareaActiva, setBusquedaTareas, tareas, fases, perfiles, ejecutivos } = useAppStore();
+  const { usuarioActivo, setVista, setTareaActiva, setBusquedaTareas, tareas, fases, perfiles, ejecutivos, tema, alternarTema } = useAppStore();
   const t = useT();
   const { puedeAdministrar, puedeGestionarUsuarios, puedeVerGanttAdmin } = usePermisos();
   const proyectosVisibles = useProyectosVisibles();
@@ -269,6 +272,15 @@ export function Header() {
             </div>
 
             <div className="flex shrink-0 items-center gap-2">
+              <button
+                type="button"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 text-slate-300 hover:bg-white/8"
+                onClick={alternarTema}
+                aria-label={t('theme_toggle')}
+                title={t('theme_toggle')}
+              >
+                {tema === 'dia' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+              </button>
               {usuarioActivo ? (
                 <button
                   className="flex items-center gap-2 rounded-lg border border-white/10 py-1.5 pl-2 pr-2 text-sm text-slate-200 hover:bg-white/8 sm:pr-3"
@@ -309,7 +321,7 @@ export function Header() {
                     {t('nav_gantt_admin')}
                   </button>
                 ) : null}
-                {puedeGestionarUsuarios || puedeAdministrar ? (
+                {MOSTRAR_AJUSTES && (puedeGestionarUsuarios || puedeAdministrar) ? (
                   <button className="shrink-0 rounded-lg border border-white/10 p-2 text-slate-300 hover:bg-white/8" onClick={() => setVista('ajustes')} aria-label={t('nav_ajustes')}>
                     <Settings className="h-5 w-5" />
                   </button>
