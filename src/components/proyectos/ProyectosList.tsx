@@ -1,4 +1,4 @@
-import { CalendarDays, Edit3, Plus } from 'lucide-react';
+import { CalendarDays, Edit3 } from 'lucide-react';
 import { useState } from 'react';
 import { usePermisos, useProyectosVisibles } from '../../hooks/usePermisos';
 import { useAppStore, calcCumplimientoGanttProyecto, calcPctPlanificadoProyecto, calcPctProyecto, semaforoCumplimientoProyecto } from '../../store/useAppStore';
@@ -7,9 +7,6 @@ import { GlassCard } from '../ui/GlassCard';
 import { ProgressBar } from '../ui/ProgressBar';
 import { TrafficLightOrb } from '../ui/TrafficLightOrb';
 import { ProyectoEditDrawer } from './ProyectoEditDrawer';
-
-// Ocultos temporalmente a pedido de Julio (08/07/2026) — volver a activar cuando se retomen estos menus.
-const MOSTRAR_AJUSTES = false;
 
 export function ProyectosList() {
   const proyectos = useProyectosVisibles();
@@ -24,12 +21,6 @@ export function ProyectosList() {
           <p className="text-sm uppercase tracking-[0.18em] text-emerald-300">Portafolio</p>
           <h1 className="mt-2 text-3xl font-semibold text-white">Proyectos de implementación</h1>
         </div>
-        {MOSTRAR_AJUSTES && puedeEditarProyectos ? (
-          <button className="inline-flex items-center gap-2 rounded-lg border border-white/10 px-4 py-2 text-sm font-medium text-slate-200 hover:bg-white/8" onClick={() => setVista('ajustes')}>
-            <Plus className="h-4 w-4" />
-            Nuevo proyecto
-          </button>
-        ) : null}
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">

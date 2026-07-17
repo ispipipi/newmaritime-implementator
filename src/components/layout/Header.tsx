@@ -7,8 +7,8 @@ import { useAppStore } from '../../store/useAppStore';
 import { useT } from '../../i18n/useT';
 import { Breadcrumb } from './Breadcrumb';
 
-// Ocultos temporalmente a pedido de Julio (08/07/2026) — volver a activar cuando se retomen estos menus.
-const MOSTRAR_AJUSTES = false;
+// Ajustes reactivado (08/07/2026) — recortado a Perfiles y Usuarios; Proyectos/Equipo/Plantilla no aplican para este despliegue de un solo proyecto.
+const MOSTRAR_AJUSTES = true;
 
 export function Header() {
   const { usuarioActivo, setVista, setTareaActiva, setBusquedaTareas, tareas, fases, perfiles, ejecutivos, tema, alternarTema } = useAppStore();

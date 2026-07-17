@@ -1,34 +1,23 @@
-import { BriefcaseBusiness, ClipboardList, Lock, ShieldCheck, UserCog, Users } from 'lucide-react';
+import { Lock, ShieldCheck, Users } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { usePermisos } from '../../hooks/usePermisos';
 import { GlassCard } from '../ui/GlassCard';
-import { MantenedorEjecutivos } from './MantenedorEjecutivos';
 import { MantenedorPerfiles } from './MantenedorPerfiles';
-import { MantenedorPlantilla } from './MantenedorPlantilla';
-import { MantenedorProyectos } from './MantenedorProyectos';
 import { MantenedorUsuarios } from './MantenedorUsuarios';
 
-type AjusteTab = 'perfiles' | 'usuarios' | 'proyectos' | 'ejecutivos' | 'plantilla';
+type AjusteTab = 'perfiles' | 'usuarios';
 
 export function AjustesView() {
   const { puedeAdministrar, puedeGestionarUsuarios } = usePermisos();
   const [tabActiva, setTabActiva] = useState<AjusteTab>('perfiles');
 
-  const tabs = useMemo(() => {
-    const base = [
+  const tabs = useMemo(
+    () => [
       { id: 'perfiles' as const, label: 'Mantenedor perfiles', description: 'Roles y accesos', icon: ShieldCheck },
       { id: 'usuarios' as const, label: 'Mantenedor usuarios', description: 'Personas, correo y perfil', icon: Users },
-    ];
-
-    if (!puedeAdministrar) return base;
-
-    return [
-      ...base,
-      { id: 'proyectos' as const, label: 'Mantenedor proyectos', description: 'Clientes e implementaciones', icon: BriefcaseBusiness },
-      { id: 'ejecutivos' as const, label: 'Mantenedor equipo', description: 'Responsables internos', icon: UserCog },
-      { id: 'plantilla' as const, label: 'Plantilla Gantt', description: 'Fases y tareas base', icon: ClipboardList },
-    ];
-  }, [puedeAdministrar]);
+    ],
+    [],
+  );
 
   const tabDisponible = tabs.some((tab) => tab.id === tabActiva) ? tabActiva : tabs[0]?.id;
 
@@ -80,9 +69,6 @@ export function AjustesView() {
         <section className="min-w-0">
           {tabDisponible === 'perfiles' ? <MantenedorPerfiles /> : null}
           {tabDisponible === 'usuarios' ? <MantenedorUsuarios /> : null}
-          {tabDisponible === 'proyectos' && puedeAdministrar ? <MantenedorProyectos /> : null}
-          {tabDisponible === 'ejecutivos' && puedeAdministrar ? <MantenedorEjecutivos /> : null}
-          {tabDisponible === 'plantilla' && puedeAdministrar ? <MantenedorPlantilla /> : null}
         </section>
       </div>
     </div>
