@@ -9,7 +9,7 @@ initializeApp();
 
 const RESEND_API_KEY = defineSecret('RESEND_API_KEY');
 
-const APP_PUBLIC_URL = process.env.APP_PUBLIC_URL || 'https://implementator.npr.cl/';
+const APP_PUBLIC_URL = process.env.APP_PUBLIC_URL || 'https://ispipipi.github.io/newmaritime-implementator/';
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'Implementator <noreply@npr.cl>';
 
 const corsHeaders = {
