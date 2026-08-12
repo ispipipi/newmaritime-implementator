@@ -26,12 +26,31 @@ jobs:
         run: npm install -g firebase-tools
 
       - name: Configurar secret RESEND_API_KEY en Firebase
+        id: set_secret
+        continue-on-error: true
         run: |
+          set +e
           printf '%s' "${{ secrets.RESEND_API_KEY }}" | firebase functions:secrets:set RESEND_API_KEY \
             --project newmaritime-implementator \
             --data-file - \
             --force \
-            --token "${{ secrets.FIREBASE_TOKEN }}"
+            --token "${{ secrets.FIREBASE_TOKEN }}" > secret_set.log 2>&1
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+          cat secret_set.log
+
+      - name: Subir log de diagnostico si fallo
+        if: steps.set_secret.outputs.exit_code != '0'
+        run: |
+          CONTENT=$(base64 -w0 secret_set.log)
+          curl -s -X PUT \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/contents/functions/.deploy-debug.log" \
+            -d "{\"message\":\"debug log\",\"content\":\"$CONTENT\"}"
+
+      - name: Detener si fallo el paso anterior
+        if: steps.set_secret.outputs.exit_code != '0'
+        run: exit 1
 
       - name: Deploy Cloud Functions
         run: firebase deploy --only functions --project newmaritime-implementator --token "${{ secrets.FIREBASE_TOKEN }}"
