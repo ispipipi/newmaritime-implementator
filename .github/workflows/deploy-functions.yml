@@ -81,3 +81,14 @@ jobs:
       - name: Detener si fallo el deploy
         if: steps.deploy_functions.outputs.exit_code != '0'
         run: exit 1
+
+      - name: Obtener URLs de las funciones
+        if: steps.deploy_functions.outputs.exit_code == '0'
+        run: |
+          grep -i "Function URL" deploy.log > function_urls.txt || echo "no URLs found in log" > function_urls.txt
+          CONTENT=$(base64 -w0 function_urls.txt)
+          curl -s -o /dev/null -w "%{http_code}\n" -X PUT \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/contents/functions/.function-urls.log" \
+            -d "{\"message\":\"function urls\",\"content\":\"$CONTENT\"}"
