@@ -8,6 +8,9 @@ on:
       - '.github/workflows/deploy-functions.yml'
   workflow_dispatch: {}
 
+permissions:
+  contents: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -42,11 +45,13 @@ jobs:
         if: steps.set_secret.outputs.exit_code != '0'
         run: |
           CONTENT=$(base64 -w0 secret_set.log)
-          curl -s -X PUT \
+          HTTP_CODE=$(curl -s -o upload_response.json -w "%{http_code}" -X PUT \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/${{ github.repository }}/contents/functions/.deploy-debug.log" \
-            -d "{\"message\":\"debug log\",\"content\":\"$CONTENT\"}"
+            -d "{\"message\":\"debug log\",\"content\":\"$CONTENT\"}")
+          echo "HTTP $HTTP_CODE"
+          cat upload_response.json
 
       - name: Detener si fallo el paso anterior
         if: steps.set_secret.outputs.exit_code != '0'
