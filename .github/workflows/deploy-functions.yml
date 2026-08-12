@@ -85,10 +85,20 @@ jobs:
       - name: Obtener URLs de las funciones
         if: steps.deploy_functions.outputs.exit_code == '0'
         run: |
-          grep -i "Function URL" deploy.log > function_urls.txt || echo "no URLs found in log" > function_urls.txt
-          CONTENT=$(base64 -w0 function_urls.txt)
-          curl -s -o /dev/null -w "%{http_code}\n" -X PUT \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/${{ github.repository }}/contents/functions/.function-urls.log" \
-            -d "{\"message\":\"function urls\",\"content\":\"$CONTENT\"}"
+          firebase functions:list --project newmaritime-implementator --token "${{ secrets.FIREBASE_TOKEN }}" > list.log 2>&1 || true
+          cat deploy.log list.log > combined_urls.log
+          CONTENT=$(base64 -w0 combined_urls.log)
+          EXISTING_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/${{ github.repository }}/contents/functions/.function-urls.log" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('sha',''))")
+          if [ -n "$EXISTING_SHA" ]; then
+            curl -s -o /dev/null -w "%{http_code}\n" -X PUT \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${{ github.repository }}/contents/functions/.function-urls.log" \
+              -d "{\"message\":\"function urls\",\"content\":\"$CONTENT\",\"sha\":\"$EXISTING_SHA\"}"
+          else
+            curl -s -o /dev/null -w "%{http_code}\n" -X PUT \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${{ github.repository }}/contents/functions/.function-urls.log" \
+              -d "{\"message\":\"function urls\",\"content\":\"$CONTENT\"}"
+          fi
