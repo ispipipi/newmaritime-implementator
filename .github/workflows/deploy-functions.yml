@@ -58,4 +58,26 @@ jobs:
         run: exit 1
 
       - name: Deploy Cloud Functions
-        run: firebase deploy --only functions --project newmaritime-implementator --token "${{ secrets.FIREBASE_TOKEN }}"
+        id: deploy_functions
+        continue-on-error: true
+        run: |
+          set +e
+          firebase deploy --only functions --project newmaritime-implementator --token "${{ secrets.FIREBASE_TOKEN }}" > deploy.log 2>&1
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+          cat deploy.log
+
+      - name: Subir log de diagnostico de deploy si fallo
+        if: steps.deploy_functions.outputs.exit_code != '0'
+        run: |
+          CONTENT=$(base64 -w0 deploy.log)
+          HTTP_CODE=$(curl -s -o upload_response2.json -w "%{http_code}" -X PUT \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/contents/functions/.deploy-debug.log" \
+            -d "{\"message\":\"deploy debug log\",\"content\":\"$CONTENT\"}")
+          echo "HTTP $HTTP_CODE"
+          cat upload_response2.json
+
+      - name: Detener si fallo el deploy
+        if: steps.deploy_functions.outputs.exit_code != '0'
+        run: exit 1
