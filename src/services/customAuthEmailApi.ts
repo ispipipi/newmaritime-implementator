@@ -1,14 +1,15 @@
 import { auth } from './firebaseClient';
 
-const baseUrl = (import.meta.env.VITE_AUTH_EMAILS_API_BASE || '').trim().replace(/\/$/, '');
+const passwordResetUrl = (import.meta.env.VITE_SEND_PASSWORD_RESET_URL || '').trim();
+const accessInviteUrl = (import.meta.env.VITE_SEND_ACCESS_INVITE_URL || '').trim();
 
-export const customAuthEmailApiReady = Boolean(baseUrl);
+export const customAuthEmailApiReady = Boolean(passwordResetUrl && accessInviteUrl);
 
 type EmailPayload = {
   email: string;
 };
 
-async function postEmailAction(path: string, payload: EmailPayload, requireAuth = false) {
+async function postEmailAction(url: string, payload: EmailPayload, requireAuth = false) {
   if (!customAuthEmailApiReady) {
     throw new Error('La API de correos transaccionales aun no esta configurada.');
   }
@@ -23,7 +24,7 @@ async function postEmailAction(path: string, payload: EmailPayload, requireAuth 
     headers.Authorization = `Bearer ${await user.getIdToken()}`;
   }
 
-  const response = await fetch(`${baseUrl}${path}`, {
+  const response = await fetch(url, {
     method: 'POST',
     headers,
     body: JSON.stringify(payload),
@@ -39,9 +40,9 @@ async function postEmailAction(path: string, payload: EmailPayload, requireAuth 
 }
 
 export async function enviarCorreoAccesoPerfilApi(email: string) {
-  return postEmailAction('/send-access-invite', { email }, true);
+  return postEmailAction(accessInviteUrl, { email }, true);
 }
 
 export async function enviarRecuperacionPasswordApi(email: string) {
-  return postEmailAction('/send-password-reset', { email });
+  return postEmailAction(passwordResetUrl, { email });
 }
