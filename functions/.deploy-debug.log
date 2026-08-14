@@ -1,0 +1,11 @@
+[33m[1m⚠ [22m[39m Authenticating with `--token` is deprecated and will be removed in a future major version of `firebase-tools`. Instead, use a service account key with `GOOGLE_APPLICATION_CREDENTIALS`: https://cloud.google.com/docs/authentication/getting-started
+Authentication Error: Your credentials are no longer valid. Please run [1mfirebase login --reauth[22m
+
+For CI servers and headless environments, generate a new token with [1mfirebase login:ci[22m
+Authentication Error: Your credentials are no longer valid. Please run [1mfirebase login --reauth[22m
+
+For CI servers and headless environments, generate a new token with [1mfirebase login:ci[22m
+
+[1m[31mError:[39m[22m Authentication Error: Your credentials are no longer valid. Please run [1mfirebase login --reauth[22m
+
+For CI servers and headless environments, generate a new token with [1mfirebase login:ci[22m
