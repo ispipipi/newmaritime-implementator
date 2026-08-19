@@ -1,4 +1,4 @@
-import { BriefcaseBusiness, Building2, CalendarRange, ListTodo, LogOut, Moon, Search, Settings, Sun, UserRound, X } from 'lucide-react';
+import { BriefcaseBusiness, Building2, CalendarRange, Languages, ListTodo, LogOut, Moon, Search, Settings, Sun, UserRound, X } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { usePermisos, useProyectosVisibles } from '../../hooks/usePermisos';
@@ -11,7 +11,7 @@ import { Breadcrumb } from './Breadcrumb';
 const MOSTRAR_AJUSTES = true;
 
 export function Header() {
-  const { usuarioActivo, setVista, setTareaActiva, setBusquedaTareas, tareas, fases, perfiles, ejecutivos, tema, alternarTema } = useAppStore();
+  const { usuarioActivo, setVista, setTareaActiva, setBusquedaTareas, tareas, fases, perfiles, ejecutivos, tema, alternarTema, idioma, alternarIdioma } = useAppStore();
   const t = useT();
   const { puedeAdministrar, puedeGestionarUsuarios, puedeVerGanttAdmin } = usePermisos();
   const proyectosVisibles = useProyectosVisibles();
@@ -280,6 +280,16 @@ export function Header() {
                 title={t('theme_toggle')}
               >
                 {tema === 'dia' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+              </button>
+              <button
+                type="button"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-2.5 py-1.5 text-xs font-medium text-slate-300 hover:bg-white/8"
+                onClick={alternarIdioma}
+                aria-label={t('language_toggle')}
+                title={t('language_toggle')}
+              >
+                <Languages className="h-4 w-4" />
+                {idioma === 'es' ? 'ES' : 'EN'}
               </button>
               {usuarioActivo ? (
                 <button

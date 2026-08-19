@@ -3,6 +3,7 @@ import { FormEvent, useMemo, useState } from 'react';
 import { usePermisos } from '../../hooks/usePermisos';
 import { useAppStore } from '../../store/useAppStore';
 import { AccesoCompania, DocumentoExpediente, PortalAcceso, TipoDocumentoExpediente } from '../../types';
+import { useT } from '../../i18n/useT';
 import { GlassCard } from '../ui/GlassCard';
 
 type Props = {
@@ -29,6 +30,7 @@ export function ProyectoExpediente({ proyectoId }: Props) {
     eliminarAccesoExpediente,
   } = useAppStore();
   const { puedeAdministrar } = usePermisos();
+  const t = useT();
   const expediente = expedientes[proyectoId] ?? { documentos: [], accesos: [] };
   const [documentoForm, setDocumentoForm] = useState({
     nombre: '',
@@ -104,10 +106,10 @@ export function ProyectoExpediente({ proyectoId }: Props) {
     <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
       <section className="space-y-4">
         <div>
-          <p className="text-sm uppercase tracking-[0.18em] text-emerald-300">Expediente digital</p>
-          <h2 className="mt-2 text-2xl font-semibold text-white">Documentos importantes</h2>
+          <p className="text-sm uppercase tracking-[0.18em] text-emerald-300">{t('exp_digital_badge')}</p>
+          <h2 className="mt-2 text-2xl font-semibold text-white">{t('exp_important_docs')}</h2>
           <p className="mt-2 text-sm text-slate-400">
-            Guarda enlaces a documentos de Drive, contratos, mandatos, certificados y archivos clave del proyecto.
+            {t('exp_docs_desc')}
           </p>
         </div>
 
@@ -116,7 +118,7 @@ export function ProyectoExpediente({ proyectoId }: Props) {
             <form className="grid gap-3 md:grid-cols-6" onSubmit={submitDocumento}>
               <input
                 className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white md:col-span-2"
-                placeholder="Nombre del documento"
+                placeholder={t('exp_doc_name_placeholder')}
                 value={documentoForm.nombre}
                 onChange={(event) => setDocumentoForm((current) => ({ ...current, nombre: event.target.value }))}
               />
@@ -131,18 +133,18 @@ export function ProyectoExpediente({ proyectoId }: Props) {
               </select>
               <input
                 className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white md:col-span-2"
-                placeholder="URL del documento"
+                placeholder={t('exp_doc_url_placeholder')}
                 type="url"
                 value={documentoForm.url}
                 onChange={(event) => setDocumentoForm((current) => ({ ...current, url: event.target.value }))}
               />
               <button className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-emerald-300">
                 <Plus className="h-4 w-4" />
-                Agregar
+                {t('exp_add')}
               </button>
               <textarea
                 className="min-h-20 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white md:col-span-6"
-                placeholder="Descripcion breve"
+                placeholder={t('exp_doc_desc_placeholder')}
                 value={documentoForm.descripcion}
                 onChange={(event) => setDocumentoForm((current) => ({ ...current, descripcion: event.target.value }))}
               />
@@ -161,17 +163,17 @@ export function ProyectoExpediente({ proyectoId }: Props) {
               />
             ))
           ) : (
-            <GlassCard className="p-5 text-sm text-slate-400">Aun no hay documentos registrados en el expediente.</GlassCard>
+            <GlassCard className="p-5 text-sm text-slate-400">{t('exp_no_docs')}</GlassCard>
           )}
         </div>
       </section>
 
       <section className="space-y-4">
         <div>
-          <p className="text-sm uppercase tracking-[0.18em] text-emerald-300">Accesos operacionales</p>
-          <h2 className="mt-2 text-2xl font-semibold text-white">Portales y claves</h2>
+          <p className="text-sm uppercase tracking-[0.18em] text-emerald-300">{t('exp_operational_access_badge')}</p>
+          <h2 className="mt-2 text-2xl font-semibold text-white">{t('exp_portals_keys')}</h2>
           <p className="mt-2 text-sm text-slate-400">
-            Registra portal, usuario y referencia segura de la clave. No guardes contrasenas en texto plano.
+            {t('exp_access_desc')}
           </p>
         </div>
 
@@ -180,7 +182,7 @@ export function ProyectoExpediente({ proyectoId }: Props) {
             <div className="rounded-lg border border-amber-300/20 bg-amber-300/10 p-3 text-sm text-amber-100">
               <div className="flex gap-2">
                 <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />
-                <p>Por seguridad, usa el campo referencia para indicar donde esta la clave: 1Password, Bitwarden, Keeper, caja fuerte interna o ticket autorizado.</p>
+                <p>{t('exp_security_notice')}</p>
               </div>
             </div>
             <GlassCard className="p-4">
@@ -196,35 +198,35 @@ export function ProyectoExpediente({ proyectoId }: Props) {
                 </select>
                 <input
                   className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
-                  placeholder="URL portal"
+                  placeholder={t('exp_portal_url_placeholder')}
                   value={accesoForm.url}
                   onChange={(event) => setAccesoForm((current) => ({ ...current, url: event.target.value }))}
                 />
                 <input
                   className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
-                  placeholder="Usuario"
+                  placeholder={t('exp_user_placeholder')}
                   value={accesoForm.usuario}
                   onChange={(event) => setAccesoForm((current) => ({ ...current, usuario: event.target.value }))}
                 />
                 <input
                   className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
-                  placeholder="Referencia segura de clave"
+                  placeholder={t('exp_key_reference_placeholder')}
                   value={accesoForm.referenciaClave}
                   onChange={(event) => setAccesoForm((current) => ({ ...current, referenciaClave: event.target.value }))}
                 />
                 <input
                   className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
-                  placeholder="Responsable del acceso"
+                  placeholder={t('exp_access_responsible_placeholder')}
                   value={accesoForm.responsable}
                   onChange={(event) => setAccesoForm((current) => ({ ...current, responsable: event.target.value }))}
                 />
                 <button className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-emerald-300">
                   <KeyRound className="h-4 w-4" />
-                  {accesoForm.id ? 'Actualizar acceso' : 'Guardar acceso'}
+                  {accesoForm.id ? t('exp_update_access') : t('exp_save_access')}
                 </button>
                 <textarea
                   className="min-h-20 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white sm:col-span-2"
-                  placeholder="Notas de uso, permisos, restricciones o proceso de solicitud"
+                  placeholder={t('exp_notes_placeholder')}
                   value={accesoForm.notas}
                   onChange={(event) => setAccesoForm((current) => ({ ...current, notas: event.target.value }))}
                 />
@@ -233,7 +235,7 @@ export function ProyectoExpediente({ proyectoId }: Props) {
           </>
         ) : (
           <GlassCard className="p-5 text-sm text-slate-400">
-            Los accesos operacionales solo estan disponibles para administradores.
+            {t('exp_admin_only')}
           </GlassCard>
         )}
 
@@ -249,7 +251,7 @@ export function ProyectoExpediente({ proyectoId }: Props) {
                 />
               ))
             ) : (
-              <GlassCard className="p-5 text-sm text-slate-400">Aun no hay accesos registrados.</GlassCard>
+              <GlassCard className="p-5 text-sm text-slate-400">{t('exp_no_access')}</GlassCard>
             )}
           </div>
         ) : null}
@@ -267,6 +269,7 @@ function DocumentoCard({
   puedeAdministrar: boolean;
   onDelete: () => void;
 }) {
+  const t = useT();
   return (
     <GlassCard className="p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -283,11 +286,11 @@ function DocumentoCard({
         </div>
         <div className="flex items-center gap-2">
           <a className="inline-flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-200 hover:bg-white/8" href={documento.url} target="_blank" rel="noreferrer">
-            Abrir
+            {t('exp_open')}
             <ExternalLink className="h-4 w-4" />
           </a>
           {puedeAdministrar ? (
-            <button className="rounded-lg border border-red-400/20 p-2 text-red-300 hover:bg-red-500/10" onClick={onDelete} aria-label={`Eliminar ${documento.nombre}`}>
+            <button className="rounded-lg border border-red-400/20 p-2 text-red-300 hover:bg-red-500/10" onClick={onDelete} aria-label={`${t('exp_delete_aria')} ${documento.nombre}`}>
               <Trash2 className="h-4 w-4" />
             </button>
           ) : null}
@@ -306,6 +309,7 @@ function AccesoCard({
   onEdit: () => void;
   onDelete: () => void;
 }) {
+  const t = useT();
   return (
     <GlassCard className="p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -315,26 +319,26 @@ function AccesoCard({
               <KeyRound className="h-3.5 w-3.5" />
               {acceso.portal}
             </span>
-            <span className="text-xs text-slate-500">Actualizado {formatoFecha(acceso.actualizadoEn)}</span>
+            <span className="text-xs text-slate-500">{t('exp_updated')} {formatoFecha(acceso.actualizadoEn)}</span>
           </div>
-          <p className="text-sm text-slate-400">Usuario</p>
+          <p className="text-sm text-slate-400">{t('exp_username_label')}</p>
           <h3 className="font-semibold text-white">{acceso.usuario}</h3>
           <div className="mt-3 grid gap-2 text-sm text-slate-400">
-            <p><span className="text-slate-500">Clave:</span> {acceso.referenciaClave || 'Referencia no registrada'}</p>
-            <p><span className="text-slate-500">Responsable:</span> {acceso.responsable || 'Sin responsable'}</p>
-            {acceso.notas ? <p><span className="text-slate-500">Notas:</span> {acceso.notas}</p> : null}
+            <p><span className="text-slate-500">{t('exp_key_label')}</span> {acceso.referenciaClave || t('exp_key_not_recorded')}</p>
+            <p><span className="text-slate-500">{t('exp_responsible_label')}</span> {acceso.responsable || t('exp_no_responsible')}</p>
+            {acceso.notas ? <p><span className="text-slate-500">{t('exp_notes_label')}</span> {acceso.notas}</p> : null}
           </div>
         </div>
         <div className="flex items-center gap-2">
           {acceso.url ? (
-            <a className="rounded-lg border border-white/10 p-2 text-slate-300 hover:bg-white/8" href={acceso.url} target="_blank" rel="noreferrer" aria-label={`Abrir ${acceso.portal}`}>
+            <a className="rounded-lg border border-white/10 p-2 text-slate-300 hover:bg-white/8" href={acceso.url} target="_blank" rel="noreferrer" aria-label={`${t('exp_open')} ${acceso.portal}`}>
               <ExternalLink className="h-4 w-4" />
             </a>
           ) : null}
           <button className="rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-300 hover:bg-white/8" onClick={onEdit}>
-            Editar
+            {t('exp_edit')}
           </button>
-          <button className="rounded-lg border border-red-400/20 p-2 text-red-300 hover:bg-red-500/10" onClick={onDelete} aria-label={`Eliminar ${acceso.portal}`}>
+          <button className="rounded-lg border border-red-400/20 p-2 text-red-300 hover:bg-red-500/10" onClick={onDelete} aria-label={`${t('exp_delete_aria')} ${acceso.portal}`}>
             <Trash2 className="h-4 w-4" />
           </button>
         </div>

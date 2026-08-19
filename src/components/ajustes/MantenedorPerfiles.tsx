@@ -2,17 +2,19 @@ import { Plus, ShieldCheck, Trash2 } from 'lucide-react';
 import { FormEvent, useState } from 'react';
 import { useAppStore } from '../../store/useAppStore';
 import { AccesosPerfil } from '../../types';
+import { useT } from '../../i18n/useT';
+import { DictKey } from '../../i18n/translations';
 import { GlassCard } from '../ui/GlassCard';
 
-const accesoLabels: Array<{ key: keyof AccesosPerfil; label: string }> = [
-  { key: 'puedeAdministrar', label: 'Administrar sistema' },
-  { key: 'puedeEditarProyectos', label: 'Editar proyectos' },
-  { key: 'puedeEditarDatosTarea', label: 'Editar datos de tareas' },
-  { key: 'puedeCambiarEstadoTarea', label: 'Cambiar estado/comentar tareas' },
-  { key: 'puedeVerGanttAdmin', label: 'Gantt admin' },
-  { key: 'puedeGestionarUsuarios', label: 'Gestionar perfiles y usuarios' },
-  { key: 'soloLectura', label: 'Solo lectura' },
-  { key: 'esCliente', label: 'Perfil cliente' },
+const accesoLabelKeys: Array<{ key: keyof AccesosPerfil; labelKey: DictKey }> = [
+  { key: 'puedeAdministrar', labelKey: 'perf_admin_system' },
+  { key: 'puedeEditarProyectos', labelKey: 'perf_edit_projects' },
+  { key: 'puedeEditarDatosTarea', labelKey: 'perf_edit_task_data' },
+  { key: 'puedeCambiarEstadoTarea', labelKey: 'perf_change_status' },
+  { key: 'puedeVerGanttAdmin', labelKey: 'perf_gantt_admin' },
+  { key: 'puedeGestionarUsuarios', labelKey: 'perf_manage_users' },
+  { key: 'soloLectura', labelKey: 'perf_readonly' },
+  { key: 'esCliente', labelKey: 'perf_client_profile' },
 ];
 
 const accesosBase: AccesosPerfil = {
@@ -28,6 +30,7 @@ const accesosBase: AccesosPerfil = {
 
 export function MantenedorPerfiles() {
   const { perfilesAcceso, crearPerfilAcceso, actualizarPerfilAcceso, eliminarPerfilAcceso } = useAppStore();
+  const t = useT();
   const [form, setForm] = useState({
     nombre: '',
     descripcion: '',
@@ -69,27 +72,27 @@ export function MantenedorPerfiles() {
           <ShieldCheck className="h-5 w-5" />
         </div>
         <div>
-          <h2 className="text-xl font-semibold text-white">Mantenedor de perfiles</h2>
-          <p className="text-sm text-slate-500">Define el nombre del perfil y los accesos que tendrá dentro de IMPLEMENTATOR.</p>
+          <h2 className="text-xl font-semibold text-white">{t('perf_title')}</h2>
+          <p className="text-sm text-slate-500">{t('perf_subtitle')}</p>
         </div>
       </div>
 
       <form className="grid gap-3" onSubmit={submit}>
         <div className="grid gap-3 lg:grid-cols-3">
-          <input className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white" placeholder="Nombre del perfil" value={form.nombre} onChange={(event) => setForm((current) => ({ ...current, nombre: event.target.value }))} />
-          <input className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white lg:col-span-2" placeholder="Descripcion" value={form.descripcion} onChange={(event) => setForm((current) => ({ ...current, descripcion: event.target.value }))} />
+          <input className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white" placeholder={t('perf_name_placeholder')} value={form.nombre} onChange={(event) => setForm((current) => ({ ...current, nombre: event.target.value }))} />
+          <input className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white lg:col-span-2" placeholder={t('perf_desc_placeholder')} value={form.descripcion} onChange={(event) => setForm((current) => ({ ...current, descripcion: event.target.value }))} />
         </div>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-          {accesoLabels.map((acceso) => (
+          {accesoLabelKeys.map((acceso) => (
             <label key={acceso.key} className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.035] px-3 py-2 text-sm text-slate-300">
               <input type="checkbox" checked={form.accesos[acceso.key]} onChange={() => toggleFormAcceso(acceso.key)} />
-              {acceso.label}
+              {t(acceso.labelKey)}
             </label>
           ))}
         </div>
         <button className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-400 px-4 py-3 font-semibold text-slate-950 hover:bg-emerald-300 sm:w-fit">
           <Plus className="h-4 w-4" />
-          Crear perfil
+          {t('perf_create')}
         </button>
       </form>
 
@@ -105,7 +108,7 @@ export function MantenedorPerfiles() {
                 />
                 <input
                   className="mt-2 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white sm:min-w-96"
-                  placeholder="Descripcion"
+                  placeholder={t('perf_desc_placeholder')}
                   value={perfil.descripcion ?? ''}
                   onChange={(event) => actualizarPerfilAcceso(perfil.id, { descripcion: event.target.value })}
                 />
@@ -114,16 +117,16 @@ export function MantenedorPerfiles() {
                 className="rounded-lg border border-red-400/20 p-2 text-red-300 hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-40"
                 disabled={perfil.protegido}
                 onClick={() => eliminarPerfilAcceso(perfil.id)}
-                aria-label={`Eliminar perfil ${perfil.nombre}`}
+                aria-label={`${t('perf_delete_aria')} ${perfil.nombre}`}
               >
                 <Trash2 className="h-4 w-4" />
               </button>
             </div>
             <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-              {accesoLabels.map((acceso) => (
+              {accesoLabelKeys.map((acceso) => (
                 <label key={`${perfil.id}-${acceso.key}`} className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.035] px-3 py-2 text-sm text-slate-300">
                   <input type="checkbox" checked={perfil.accesos[acceso.key]} onChange={() => togglePerfilAcceso(perfil.id, perfil.accesos, acceso.key)} />
-                  {acceso.label}
+                  {t(acceso.labelKey)}
                 </label>
               ))}
             </div>

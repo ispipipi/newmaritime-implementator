@@ -2,6 +2,7 @@ import { Mail, Plus, Trash2, UsersRound } from 'lucide-react';
 import { FormEvent, useState } from 'react';
 import { enviarCorreoAccesoPerfil } from '../../services/userAccess';
 import { useAppStore } from '../../store/useAppStore';
+import { useT } from '../../i18n/useT';
 import { GlassCard } from '../ui/GlassCard';
 
 const colores = ['#3b82f6', '#8b5cf6', '#ec4899', '#f97316', '#14b8a6', '#22c55e', '#06b6d4'];
@@ -17,6 +18,7 @@ const inicialesDesdeNombre = (nombre: string) =>
 
 export function MantenedorUsuarios() {
   const { perfiles: usuarios, perfilesAcceso, proyectos, crearUsuario, actualizarUsuario, eliminarUsuario } = useAppStore();
+  const t = useT();
   const [emailEnProceso, setEmailEnProceso] = useState('');
   const [mensajeAcceso, setMensajeAcceso] = useState<{ tipo: 'ok' | 'error'; texto: string } | null>(null);
   const [filtroPerfil, setFiltroPerfil] = useState<'todos' | string>('todos');
@@ -37,18 +39,18 @@ export function MantenedorUsuarios() {
     setMensajeAcceso(null);
 
     if (!emailNormalizado) {
-      setMensajeAcceso({ tipo: 'error', texto: 'Asigna un correo antes de enviar el acceso.' });
+      setMensajeAcceso({ tipo: 'error', texto: t('usr_assign_email_first') });
       return;
     }
 
     setEmailEnProceso(emailNormalizado);
     try {
       const resultado = await enviarCorreoAccesoPerfil(emailNormalizado);
-      setMensajeAcceso({ tipo: 'ok', texto: `${resultado} Destinatario: ${emailNormalizado}` });
+      setMensajeAcceso({ tipo: 'ok', texto: `${resultado} ${t('usr_recipient')} ${emailNormalizado}` });
     } catch (error) {
       setMensajeAcceso({
         tipo: 'error',
-        texto: error instanceof Error ? error.message : 'No se pudo enviar el correo de acceso.',
+        texto: error instanceof Error ? error.message : t('usr_send_error'),
       });
     } finally {
       setEmailEnProceso('');
@@ -94,14 +96,14 @@ export function MantenedorUsuarios() {
           <UsersRound className="h-5 w-5" />
         </div>
         <div>
-          <h2 className="text-xl font-semibold text-white">Mantenedor de usuarios</h2>
-          <p className="text-sm text-slate-500">Crea, edita y elimina usuarios. Cada usuario debe tener nombre, correo y perfil.</p>
+          <h2 className="text-xl font-semibold text-white">{t('usr_title')}</h2>
+          <p className="text-sm text-slate-500">{t('usr_subtitle')}</p>
         </div>
       </div>
 
       <form className="grid gap-3 lg:grid-cols-6" onSubmit={submit}>
-        <input className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white lg:col-span-2" placeholder="Nombre" value={form.nombre} onChange={(event) => setForm((current) => ({ ...current, nombre: event.target.value }))} />
-        <input className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white lg:col-span-2" placeholder="Correo" type="email" value={form.email} onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))} />
+        <input className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white lg:col-span-2" placeholder={t('usr_name_placeholder')} value={form.nombre} onChange={(event) => setForm((current) => ({ ...current, nombre: event.target.value }))} />
+        <input className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white lg:col-span-2" placeholder={t('usr_email_placeholder')} type="email" value={form.email} onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))} />
         <select className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white" value={form.perfil} onChange={(event) => setForm((current) => ({ ...current, perfil: event.target.value, proyectoClienteId: '', proyectoIds: [] }))}>
           {perfilesAcceso.map((perfil) => (
             <option key={perfil.id} value={perfil.id}>{perfil.nombre}</option>
@@ -109,11 +111,11 @@ export function MantenedorUsuarios() {
         </select>
         <button className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-400 px-4 py-2 font-semibold text-slate-950 hover:bg-emerald-300">
           <Plus className="h-4 w-4" />
-          Crear usuario
+          {t('usr_create')}
         </button>
         {requiereProyectoCliente ? (
           <select className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white lg:col-span-3" value={form.proyectoClienteId} onChange={(event) => setForm((current) => ({ ...current, proyectoClienteId: event.target.value }))}>
-            <option value="">Proyecto cliente</option>
+            <option value="">{t('usr_client_project')}</option>
             {proyectos.map((proyecto) => (
               <option key={proyecto.id} value={proyecto.id}>{proyecto.nombre}</option>
             ))}
@@ -121,7 +123,7 @@ export function MantenedorUsuarios() {
         ) : null}
         {requiereMultiplesProyectos ? (
           <div className="rounded-lg border border-white/10 bg-white/[0.035] p-3 text-sm text-slate-300 lg:col-span-6">
-            <p className="mb-2 font-medium text-white">Proyectos visibles para REX+</p>
+            <p className="mb-2 font-medium text-white">{t('usr_visible_projects_rexplus')}</p>
             <div className="flex flex-wrap gap-2">
               {proyectos.map((proyecto) => {
                 const active = form.proyectoIds.includes(proyecto.id);
@@ -149,9 +151,9 @@ export function MantenedorUsuarios() {
 
       <div className="mt-5 flex flex-col gap-3 rounded-lg border border-white/10 bg-white/[0.035] p-3 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <p className="text-sm font-medium text-white">Filtrar usuarios por perfil</p>
+          <p className="text-sm font-medium text-white">{t('usr_filter_by_profile')}</p>
           <p className="text-xs text-slate-500">
-            Mostrando {usuariosFiltrados.length} de {usuarios.length} usuario(s).
+            {t('usr_showing')} {usuariosFiltrados.length} {t('usr_of')} {usuarios.length} {t('usr_users_word')}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -160,7 +162,7 @@ export function MantenedorUsuarios() {
             className={`rounded-lg border px-3 py-2 text-sm ${filtroPerfil === 'todos' ? 'border-emerald-300/40 bg-emerald-400/12 text-emerald-100' : 'border-white/10 bg-white/5 text-slate-300'}`}
             onClick={() => setFiltroPerfil('todos')}
           >
-            Todos
+            {t('usr_all')}
           </button>
           {perfilesAcceso.map((perfil) => {
             const activo = filtroPerfil === perfil.id;
@@ -191,7 +193,7 @@ export function MantenedorUsuarios() {
           return (
             <div key={usuario.id} className="grid gap-3 rounded-lg border border-white/10 bg-white/[0.035] p-4 lg:grid-cols-12">
               <input className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white lg:col-span-3" value={usuario.nombre} onChange={(event) => actualizarUsuario(usuario.id, { nombre: event.target.value, iniciales: inicialesDesdeNombre(event.target.value) })} />
-              <input className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white lg:col-span-3" type="email" placeholder="Correo" value={usuario.email ?? ''} onChange={(event) => actualizarUsuario(usuario.id, { email: event.target.value.trim().toLowerCase() })} />
+              <input className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white lg:col-span-3" type="email" placeholder={t('usr_email_placeholder')} value={usuario.email ?? ''} onChange={(event) => actualizarUsuario(usuario.id, { email: event.target.value.trim().toLowerCase() })} />
               <select className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white lg:col-span-3" value={usuario.perfil} onChange={(event) => actualizarUsuario(usuario.id, { perfil: event.target.value, rol: perfilesAcceso.find((item) => item.id === event.target.value)?.nombre ?? usuario.rol, proyectoClienteId: perfilEsCliente(event.target.value) ? usuario.proyectoClienteId || proyectos[0]?.id : undefined, proyectoIds: perfilEsRexPlus(event.target.value) ? usuario.proyectoIds ?? [] : undefined })}>
                 {perfilesAcceso.map((item) => (
                   <option key={item.id} value={item.id}>{item.nombre}</option>
@@ -204,14 +206,14 @@ export function MantenedorUsuarios() {
                 type="button"
               >
                 <Mail className="h-4 w-4" />
-                {enviandoAcceso ? 'Enviando...' : 'Enviar acceso'}
+                {enviandoAcceso ? t('usr_sending') : t('usr_send_access')}
               </button>
-              <button className="rounded-lg border border-red-400/20 p-2 text-red-300 hover:bg-red-500/10" onClick={() => eliminarUsuario(usuario.id)} aria-label={`Eliminar ${usuario.nombre}`} type="button">
+              <button className="rounded-lg border border-red-400/20 p-2 text-red-300 hover:bg-red-500/10" onClick={() => eliminarUsuario(usuario.id)} aria-label={`${t('usr_delete_aria')} ${usuario.nombre}`} type="button">
                 <Trash2 className="h-4 w-4" />
               </button>
               {esCliente ? (
                 <select className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white lg:col-span-6" value={usuario.proyectoClienteId ?? ''} onChange={(event) => actualizarUsuario(usuario.id, { proyectoClienteId: event.target.value })}>
-                  <option value="">Proyecto cliente</option>
+                  <option value="">{t('usr_client_project')}</option>
                   {proyectos.map((proyecto) => (
                     <option key={proyecto.id} value={proyecto.id}>{proyecto.nombre}</option>
                   ))}
@@ -220,9 +222,9 @@ export function MantenedorUsuarios() {
               {esRexPlus ? (
                 <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3 lg:col-span-12">
                   <div className="mb-3 flex flex-wrap items-center gap-2">
-                    <p className="text-sm font-medium text-white">Proyectos asignados a REX+</p>
+                    <p className="text-sm font-medium text-white">{t('usr_rexplus_assigned_projects')}</p>
                     <span className="rounded-full border border-emerald-300/20 bg-emerald-400/10 px-2 py-1 text-[11px] font-medium text-emerald-100">
-                      {proyectosAsignados.length} asignado(s)
+                      {proyectosAsignados.length} {t('usr_assigned_word')}
                     </span>
                   </div>
                   {proyectosAsignados.length ? (
@@ -237,7 +239,7 @@ export function MantenedorUsuarios() {
                       ))}
                     </div>
                   ) : (
-                    <p className="mb-3 text-xs text-amber-200">Este usuario REX+ aun no tiene proyectos visibles asignados.</p>
+                    <p className="mb-3 text-xs text-amber-200">{t('usr_rexplus_no_projects')}</p>
                   )}
                   <div className="flex flex-wrap gap-2">
                     {proyectos.map((proyecto) => {
@@ -261,11 +263,11 @@ export function MantenedorUsuarios() {
                 </div>
               ) : null}
               <div className="flex flex-wrap items-center gap-2 text-xs lg:col-span-12">
-                <span className="text-slate-500">Perfil actual: {perfil?.nombre ?? usuario.perfil}</span>
+                <span className="text-slate-500">{t('usr_current_profile')} {perfil?.nombre ?? usuario.perfil}</span>
                 {esRexPlus ? (
                   <>
                     <span className="rounded-full border border-emerald-300/20 bg-emerald-400/10 px-2 py-1 font-medium text-emerald-100">
-                      {proyectosAsignados.length} proyecto(s) visibles
+                      {proyectosAsignados.length} {t('usr_visible_projects')}
                     </span>
                     {proyectosAsignados.slice(0, 3).map((nombre) => (
                       <span
@@ -276,13 +278,13 @@ export function MantenedorUsuarios() {
                       </span>
                     ))}
                     {proyectosAsignados.length > 3 ? (
-                      <span className="text-slate-500">+{proyectosAsignados.length - 3} más</span>
+                      <span className="text-slate-500">+{proyectosAsignados.length - 3} {t('usr_more')}</span>
                     ) : null}
                   </>
                 ) : null}
                 {esCliente && proyectoCliente ? (
                   <span className="rounded-full border border-violet-300/20 bg-violet-400/10 px-2 py-1 font-medium text-violet-100">
-                    Cliente: {proyectoCliente.nombre}
+                    {t('usr_client_label')} {proyectoCliente.nombre}
                   </span>
                 ) : null}
               </div>
@@ -291,7 +293,7 @@ export function MantenedorUsuarios() {
         })}
         {usuariosFiltrados.length === 0 ? (
           <div className="rounded-lg border border-white/10 bg-white/[0.03] p-5 text-sm text-slate-400">
-            No hay usuarios para el filtro seleccionado.
+            {t('usr_no_users_for_filter')}
           </div>
         ) : null}
       </div>
