@@ -5,6 +5,7 @@ import { useAppStore } from '../../store/useAppStore';
 import { FiltroTareasVista, OrdenTareasVista, Tarea, UsuarioActivo } from '../../types';
 import { normalizarResponsable, responsableAsignadoAUsuario } from '../../utils/assignee';
 import { tareaEstaVencida, tareaVenceHoy, tareaVencePronto } from '../../utils/taskHealth';
+import { useT } from '../../i18n/useT';
 import { TareasDrilldown } from '../proyectos/TareasDrilldown';
 
 const getTasksForUser = (tareas: Tarea[], proyectoIds: string[], usuario: UsuarioActivo | null) => {
@@ -50,6 +51,7 @@ const filtrarTareas = (tareas: Tarea[], filtro: FiltroTareasVista) => {
 
 export function MisTareasView() {
   const proyectos = useProyectosVisibles();
+  const t = useT();
   const {
     tareas,
     usuarioActivo,
@@ -109,19 +111,19 @@ export function MisTareasView() {
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-sm uppercase tracking-[0.18em] text-emerald-300">Operacion diaria</p>
-          <h1 className="mt-2 text-3xl font-semibold text-white sm:text-4xl">Mis tareas</h1>
+          <p className="text-sm uppercase tracking-[0.18em] text-emerald-300">{t('mistareas_badge')}</p>
+          <h1 className="mt-2 text-3xl font-semibold text-white sm:text-4xl">{t('mistareas_title')}</h1>
           <p className="mt-2 text-slate-400">
             {usuarioActivo?.perfil === 'artbpo_ejecutivo' || usuarioActivo?.perfil === 'artbpo_admin'
-              ? 'Tareas asignadas directamente a tu nombre, agrupadas por proyecto, fase y tarea.'
-              : 'Tareas disponibles para tu perfil, agrupadas por proyecto, fase y tarea.'}
+              ? t('mistareas_subtitle_own')
+              : t('mistareas_subtitle_generic')}
           </p>
         </div>
         <div className="relative w-full sm:w-80">
           <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
           <input
             className="w-full rounded-lg border border-white/10 bg-white/5 py-2 pl-9 pr-3 text-sm text-white"
-            placeholder="Buscar tarea"
+            placeholder={t('mistareas_search_placeholder')}
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
@@ -138,8 +140,8 @@ export function MisTareasView() {
               <AlertTriangle className="h-5 w-5" />
             </span>
             <div>
-              <p className="font-semibold text-red-100">{vencidas.length} tarea(s) vencida(s) requieren atención inmediata</p>
-              <p className="text-sm text-red-200/80">Están destacadas en rojo dentro del listado para entrar directo a gestionarlas.</p>
+              <p className="font-semibold text-red-100">{vencidas.length} {t('mistareas_overdue_banner')}</p>
+              <p className="text-sm text-red-200/80">{t('mistareas_overdue_banner_sub')}</p>
             </div>
           </div>
         </div>
@@ -151,49 +153,49 @@ export function MisTareasView() {
           onClick={() => setFiltroTareasVista('vencidas')}
           className={`rounded-xl border p-4 text-left shadow-[0_0_24px_rgba(239,68,68,0.12)] transition ${filtroTareasVista === 'vencidas' ? 'border-red-300 bg-red-500/18 ring-1 ring-red-300/40' : 'border-red-400/40 bg-red-500/12 hover:bg-red-500/16'}`}
         >
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-red-200">Vencidas</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-red-200">{t('mistareas_card_overdue')}</p>
           <p className="mt-2 text-3xl font-semibold text-white">{vencidas.length}</p>
-          <p className="mt-1 text-sm text-red-100/80">Prioridad máxima hoy</p>
+          <p className="mt-1 text-sm text-red-100/80">{t('mistareas_card_overdue_sub')}</p>
         </button>
         <button
           type="button"
           onClick={() => setFiltroTareasVista('hoy')}
           className={`rounded-xl border p-4 text-left transition ${filtroTareasVista === 'hoy' ? 'border-amber-200 bg-amber-400/18 ring-1 ring-amber-200/40' : 'border-amber-300/30 bg-amber-400/10 hover:bg-amber-400/14'}`}
         >
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-200">Vencen hoy</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-200">{t('mistareas_card_today')}</p>
           <p className="mt-2 text-3xl font-semibold text-white">{vencenHoy.length}</p>
-          <p className="mt-1 text-sm text-amber-100/80">Necesitan cierre o avance</p>
+          <p className="mt-1 text-sm text-amber-100/80">{t('mistareas_card_today_sub')}</p>
         </button>
         <button
           type="button"
           onClick={() => setFiltroTareasVista('proximas')}
           className={`rounded-xl border p-4 text-left transition ${filtroTareasVista === 'proximas' ? 'border-orange-200 bg-orange-400/18 ring-1 ring-orange-200/40' : 'border-orange-300/25 bg-orange-400/10 hover:bg-orange-400/14'}`}
         >
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-orange-200">Próximas 48h</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-orange-200">{t('mistareas_card_soon')}</p>
           <p className="mt-2 text-3xl font-semibold text-white">{vencenPronto.length}</p>
-          <p className="mt-1 text-sm text-orange-100/80">Revisar antes que escalen</p>
+          <p className="mt-1 text-sm text-orange-100/80">{t('mistareas_card_soon_sub')}</p>
         </button>
         <button
           type="button"
           onClick={() => setFiltroTareasVista('bloqueadas')}
           className={`rounded-xl border p-4 text-left transition ${filtroTareasVista === 'bloqueadas' ? 'border-slate-200 bg-white/[0.08] ring-1 ring-slate-200/30' : 'border-slate-300/20 bg-white/[0.04] hover:bg-white/[0.06]'}`}
         >
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">Bloqueadas</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">{t('mistareas_card_blocked')}</p>
           <p className="mt-2 text-3xl font-semibold text-white">{bloqueadas.length}</p>
-          <p className="mt-1 text-sm text-slate-400">Requieren ayuda o decisión</p>
+          <p className="mt-1 text-sm text-slate-400">{t('mistareas_card_blocked_sub')}</p>
         </button>
       </div>
 
       <div className="flex flex-wrap gap-2">
         {[
-          ['todas', 'Todas'],
-          ['atencion', 'En atención'],
-          ['vencidas', 'Solo vencidas'],
-          ['en_proceso', 'En proceso'],
-          ['hoy', 'Solo hoy'],
-          ['proximas', 'Próximas 48h'],
-          ['bloqueadas', 'Solo bloqueadas'],
-          ['completadas', 'Solo completadas'],
+          ['todas', t('filter_todas')],
+          ['atencion', t('filter_atencion')],
+          ['vencidas', t('filter_vencidas')],
+          ['en_proceso', t('filter_en_proceso')],
+          ['hoy', t('filter_hoy')],
+          ['proximas', t('filter_proximas')],
+          ['bloqueadas', t('filter_bloqueadas')],
+          ['completadas', t('filter_completadas')],
         ].map(([valor, label]) => {
           const activo = filtroTareasVista === valor;
           return (
@@ -210,12 +212,12 @@ export function MisTareasView() {
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-sm font-medium text-slate-400">Ordenar por:</span>
+        <span className="text-sm font-medium text-slate-400">{t('order_by')}</span>
         {[
-          ['criticas', 'Más críticas primero'],
-          ['vence', 'Más próximas a vencer'],
-          ['nuevas', 'Más nuevas'],
-          ['plan', 'Plan original'],
+          ['criticas', t('order_criticas')],
+          ['vence', t('order_vence')],
+          ['nuevas', t('order_nuevas')],
+          ['plan', t('order_plan')],
         ].map(([valor, label]) => {
           const activo = ordenTareasVista === valor;
           return (
@@ -237,12 +239,12 @@ export function MisTareasView() {
         <section className="space-y-4 pt-2">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="text-sm uppercase tracking-[0.18em] text-emerald-300">Vista administrador</p>
-              <h2 className="mt-2 text-2xl font-semibold text-white">Tareas por persona</h2>
-              <p className="mt-1 text-sm text-slate-400">Consulta la carga de cualquier responsable sin mezclarla con tus propias tareas.</p>
+              <p className="text-sm uppercase tracking-[0.18em] text-emerald-300">{t('mistareas_admin_view')}</p>
+              <h2 className="mt-2 text-2xl font-semibold text-white">{t('mistareas_tasks_by_person')}</h2>
+              <p className="mt-1 text-sm text-slate-400">{t('mistareas_admin_subtitle')}</p>
             </div>
             <label className="grid w-full gap-2 text-sm text-slate-300 sm:w-80">
-              Responsable
+              {t('mistareas_responsible_label')}
               <select className="rounded-lg border border-white/10 bg-white/5 px-3 py-3 text-white" value={persona} onChange={(event) => setPersonaSeleccionada(event.target.value)}>
                 {personasAsignables.map((item) => (
                   <option key={item} value={item}>
@@ -255,7 +257,7 @@ export function MisTareasView() {
           <div className="rounded-xl border border-white/10 bg-white/[0.035] p-3">
             <div className="mb-3 flex items-center gap-2 px-1 text-sm font-semibold text-slate-300">
               <UsersRound className="h-4 w-4 text-emerald-300" />
-              {tareasPorPersonaFiltradas.length} tarea(s) asignada(s) a {persona || 'responsable'}
+              {tareasPorPersonaFiltradas.length} {t('mistareas_tasks_assigned_to')} {persona || t('mistareas_responsible_fallback')}
             </div>
             <TareasDrilldown tareas={tareasPorPersonaFiltradas} query={query} sortMode={ordenTareasVista} />
           </div>
