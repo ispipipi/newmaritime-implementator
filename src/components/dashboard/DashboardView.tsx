@@ -1,6 +1,8 @@
 import { AlertTriangle, ArrowLeft, ArrowRight, BarChart3, CheckCircle2, Clock3, FolderKanban, Gauge, ListChecks } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { usePermisos, useProyectosVisibles } from '../../hooks/usePermisos';
+import { useT } from '../../i18n/useT';
+import { DictKey } from '../../i18n/translations';
 import {
   useAppStore,
   calcCumplimientoGanttFase,
@@ -32,33 +34,34 @@ type KpiStat = {
   icon: typeof FolderKanban;
 };
 
-const kpiTitles: Record<KpiDetalle, string> = {
-  proyectos: 'Proyectos activos',
-  completadas: 'Tareas completadas',
-  en_proceso: 'Tareas en proceso',
-  alertas: 'Alertas abiertas',
-  avance: 'Avance promedio',
-  semaforo: 'Semaforo operacional',
+const kpiTitleKeys: Record<KpiDetalle, DictKey> = {
+  proyectos: 'kpi_proyectos_title',
+  completadas: 'kpi_completadas_title',
+  en_proceso: 'kpi_en_proceso_title',
+  alertas: 'kpi_alertas_title',
+  avance: 'kpi_avance_title',
+  semaforo: 'kpi_semaforo_title',
 };
 
-const kpiDescriptions: Record<KpiDetalle, string> = {
-  proyectos: 'Drill down de proyectos activos hacia fases y tareas.',
-  completadas: 'Tareas terminadas agrupadas por proyecto y fase.',
-  en_proceso: 'Tareas actualmente en ejecucion agrupadas por proyecto y fase.',
-  alertas: 'Alertas abiertas agrupadas por proyecto, fase y tarea asociada.',
-  avance: 'Avance del portafolio por proyecto, fase y tarea.',
-  semaforo: 'Lectura de criticidad por proyecto, fase y tareas agrupadas por estado.',
+const kpiDescKeys: Record<KpiDetalle, DictKey> = {
+  proyectos: 'kpi_proyectos_desc',
+  completadas: 'kpi_completadas_desc',
+  en_proceso: 'kpi_en_proceso_desc',
+  alertas: 'kpi_alertas_desc',
+  avance: 'kpi_avance_desc',
+  semaforo: 'kpi_semaforo_desc',
 };
 
 const sortFases = (a: Fase, b: Fase) => a.orden - b.orden;
 const sortTareas = (a: Tarea, b: Tarea) => a.fechaInicioPlan.localeCompare(b.fechaInicioPlan);
 const semaforoPrioridad: Record<EstadoSemaforo, number> = { rojo: 0, amarillo: 1, verde: 2 };
-const semaforoText: Record<EstadoSemaforo, string> = { rojo: 'Critico', amarillo: 'Atencion', verde: 'En control' };
+const semaforoKeys: Record<EstadoSemaforo, DictKey> = { rojo: 'semaforo_critico', amarillo: 'semaforo_atencion', verde: 'semaforo_en_control' };
 
 export function DashboardView() {
   const proyectos = useProyectosVisibles();
   const { tareas, fases, alertas, setVista, usuarioActivo, setBusquedaTareas, setFiltroTareasVista, setOrdenTareasVista } = useAppStore();
   const { esCliente } = usePermisos();
+  const t = useT();
   const [kpiActivo, setKpiActivo] = useState<KpiDetalle | null>(null);
   const [proyectoDrillId, setProyectoDrillId] = useState<string | null>(null);
   const [faseDrillId, setFaseDrillId] = useState<string | null>(null);
@@ -69,7 +72,7 @@ export function DashboardView() {
     if (!proyectoCliente) {
       return (
         <GlassCard className="p-6 text-slate-300">
-          No hay un proyecto cliente asociado a este perfil.
+          {t('dash_client_no_project')}
         </GlassCard>
       );
     }
@@ -86,25 +89,25 @@ export function DashboardView() {
           <GlassCard className="p-6 sm:p-8">
             <div className="grid gap-8 lg:grid-cols-[1fr_180px] lg:items-center">
               <div>
-                <p className="text-sm uppercase tracking-[0.18em] text-emerald-300">Vista cliente</p>
+                <p className="text-sm uppercase tracking-[0.18em] text-emerald-300">{t('dash_client_badge')}</p>
                 <h1 className="mt-3 text-3xl font-semibold text-white sm:text-4xl">{proyectoCliente.nombre}</h1>
                 <p className="mt-3 max-w-2xl text-slate-400">
-                  Avance de implementacion de tu empresa y cumplimiento por fase. Puedes entrar a cada fase para revisar las tareas asociadas.
+                  {t('dash_client_subtitle')}
                 </p>
                 <div className="mt-6 flex flex-wrap gap-3">
                   <button className="inline-flex items-center gap-2 rounded-lg bg-emerald-400 px-4 py-2 font-semibold text-slate-950 hover:bg-emerald-300" onClick={() => setVista('proyecto', proyectoCliente.id)}>
-                    Ver ficha del proyecto
+                    {t('dash_view_project')}
                     <ArrowRight className="h-4 w-4" />
                   </button>
                   <button className="rounded-lg border border-white/10 px-4 py-2 font-medium text-slate-200 hover:bg-white/8" onClick={() => setVista('mis_tareas')}>
-                    Mis tareas
+                    {t('dash_my_tasks')}
                   </button>
                 </div>
               </div>
               <div className="flex flex-col items-center gap-4">
                 <TrafficLightOrb estado={estado} size="lg" label={`Gantt ${cumplimiento}%`} />
                 <ProgressRing value={avance} size={126} />
-                <p className="text-sm text-slate-400">% avance real</p>
+                <p className="text-sm text-slate-400">{t('dash_real_progress')}</p>
               </div>
             </div>
           </GlassCard>
@@ -113,24 +116,24 @@ export function DashboardView() {
             <GlassCard className="p-5">
               <BarChart3 className="mb-4 h-5 w-5 text-emerald-300" />
               <p className="text-3xl font-semibold text-white">{avance}%</p>
-              <p className="mt-1 text-sm text-slate-400">Avance empresa</p>
+              <p className="mt-1 text-sm text-slate-400">{t('dash_company_progress')}</p>
             </GlassCard>
             <GlassCard className="p-5">
               <ListChecks className="mb-4 h-5 w-5 text-blue-300" />
               <p className="text-3xl font-semibold text-white">{tareasProyecto.length}</p>
-              <p className="mt-1 text-sm text-slate-400">Tareas totales</p>
+              <p className="mt-1 text-sm text-slate-400">{t('dash_total_tasks')}</p>
             </GlassCard>
             <GlassCard className="p-5">
               <CheckCircle2 className="mb-4 h-5 w-5 text-emerald-300" />
               <p className="text-3xl font-semibold text-white">{tareasProyecto.filter((t) => t.estado === 'completada').length}</p>
-              <p className="mt-1 text-sm text-slate-400">Tareas completas</p>
+              <p className="mt-1 text-sm text-slate-400">{t('dash_completed_tasks')}</p>
             </GlassCard>
           </div>
 
           <div className="space-y-4">
             <div>
-              <p className="text-sm uppercase tracking-[0.18em] text-emerald-300">Cumplimiento por fase</p>
-              <h2 className="mt-2 text-2xl font-semibold text-white">Fases de implementacion</h2>
+              <p className="text-sm uppercase tracking-[0.18em] text-emerald-300">{t('dash_compliance_by_phase')}</p>
+              <h2 className="mt-2 text-2xl font-semibold text-white">{t('dash_implementation_phases')}</h2>
             </div>
             <div className="grid gap-4 md:grid-cols-2">
               {fasesProyecto.map((fase) => {
@@ -143,12 +146,12 @@ export function DashboardView() {
                         <div>
                           <span className="rounded-md bg-white/8 px-2 py-1 text-xs font-semibold text-emerald-200">{fase.codigo}</span>
                           <h3 className="mt-3 font-semibold text-white">{fase.nombre}</h3>
-                          <p className="mt-1 text-sm text-slate-500">{tareasFase.length} tarea(s)</p>
+                          <p className="mt-1 text-sm text-slate-500">{tareasFase.length} {t('dash_task_count')}</p>
                         </div>
                         <ArrowRight className="h-5 w-5 text-slate-500" />
                       </div>
                       <div className="mt-5 mb-2 flex items-center justify-between text-sm">
-                        <span className="text-slate-400">Cumplimiento</span>
+                        <span className="text-slate-400">{t('dash_compliance')}</span>
                         <span className="font-semibold text-white">{pct}%</span>
                       </div>
                       <ProgressBar value={pct} tone={pct === 100 ? 'emerald' : 'blue'} />
@@ -183,10 +186,10 @@ export function DashboardView() {
   const proyectosActivos = proyectos.filter((p) => p.estado === 'activo');
 
   const stats: KpiStat[] = [
-    { id: 'proyectos', label: 'Proyectos activos', value: proyectosActivos.length, icon: FolderKanban },
-    { id: 'completadas', label: 'Tareas completadas', value: tareasVisibles.filter((t) => t.estado === 'completada').length, icon: CheckCircle2 },
-    { id: 'en_proceso', label: 'En proceso', value: tareasVisibles.filter((t) => t.estado === 'en_proceso').length, icon: Clock3 },
-    { id: 'alertas', label: 'Alertas abiertas', value: alertasAbiertas.length, icon: AlertTriangle },
+    { id: 'proyectos', label: t('kpi_proyectos_title'), value: proyectosActivos.length, icon: FolderKanban },
+    { id: 'completadas', label: t('kpi_completadas_title'), value: tareasVisibles.filter((t) => t.estado === 'completada').length, icon: CheckCircle2 },
+    { id: 'en_proceso', label: t('dash_en_proceso_stat'), value: tareasVisibles.filter((t) => t.estado === 'en_proceso').length, icon: Clock3 },
+    { id: 'alertas', label: t('kpi_alertas_title'), value: alertasAbiertas.length, icon: AlertTriangle },
   ];
 
   const abrirKpi = (id: KpiDetalle) => {
@@ -246,11 +249,11 @@ export function DashboardView() {
                 <p className="mt-2 text-sm text-slate-400">The ultimate project control</p>
                 <div className="mt-6 flex flex-wrap gap-3">
                   <button className="inline-flex items-center gap-2 rounded-lg bg-emerald-400 px-4 py-2 font-semibold text-slate-950 hover:bg-emerald-300" onClick={abrirProyectos}>
-                    Ver proyectos
+                    {t('nav_proyectos')}
                     <ArrowRight className="h-4 w-4" />
                   </button>
                   <button className="rounded-lg border border-white/10 px-4 py-2 font-medium text-slate-200 hover:bg-white/8" onClick={() => abrirModoAccion('atencion', 'criticas')}>
-                    Ir a pendientes críticos
+                    {t('dash_open_pending')}
                   </button>
                 </div>
               </div>
@@ -259,12 +262,12 @@ export function DashboardView() {
                   <TrafficLightOrb estado={semaforo} size="lg" />
                   <div>
                     <p className="text-2xl font-semibold text-white">{cumplimientoPromedio}%</p>
-                    <p className="text-sm text-slate-400">Cumplimiento Gantt</p>
+                    <p className="text-sm text-slate-400">{t('dash_gantt_compliance')}</p>
                   </div>
                 </div>
                 <div className="flex flex-col items-center gap-3">
                   <ProgressRing value={promedio} size={116} />
-                  <p className="text-sm text-slate-400">% avance real</p>
+                  <p className="text-sm text-slate-400">{t('dash_real_progress')}</p>
                 </div>
               </button>
             </div>
@@ -283,12 +286,12 @@ export function DashboardView() {
                     : () => abrirModoAccion('atencion', 'criticas');
             const helper =
               stat.id === 'proyectos'
-                ? 'Abrir portafolio'
+                ? t('dash_open_portfolio')
                 : stat.id === 'completadas'
-                  ? 'Abrir completadas'
+                  ? t('dash_open_completed')
                   : stat.id === 'en_proceso'
-                    ? 'Abrir tareas activas'
-                    : 'Abrir bandeja crítica';
+                    ? t('dash_open_active_tasks')
+                    : t('dash_open_critical_inbox');
 
             return (
             <GlassCard key={stat.label} interactive className={`p-0 ${kpiActivo === stat.id ? 'border-emerald-300/35 bg-emerald-300/10' : ''}`}>
@@ -309,17 +312,17 @@ export function DashboardView() {
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <h3 className="font-semibold text-white">{proyecto.nombre}</h3>
-                    <p className="mt-1 text-sm text-slate-400">{proyecto.categoria} · Go live {proyecto.fechaGoLive}</p>
+                    <p className="mt-1 text-sm text-slate-400">{proyecto.categoria} · {t('go_live_label')} {proyecto.fechaGoLive}</p>
                   </div>
                   <TrafficLightOrb estado={semaforoCumplimientoProyecto(proyecto.id, tareas)} size="sm" />
                 </div>
                 <div className="mt-4 grid gap-2 text-sm">
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-400">Cumplimiento Gantt</span>
+                    <span className="text-slate-400">{t('dash_gantt_compliance')}</span>
                     <span className="font-semibold text-white">{calcCumplimientoGanttProyecto(proyecto.id, tareas)}%</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-400">% avance real</span>
+                    <span className="text-slate-400">{t('dash_real_progress')}</span>
                   <span className="font-semibold text-white">{calcPctProyecto(proyecto.id, tareas)}%</span>
                   </div>
                 </div>
@@ -362,6 +365,7 @@ function DashboardKpiDetalle({
   proyectosActivos: Proyecto[];
   tareas: Tarea[];
 }) {
+  const t = useT();
   const tareasKpi = useMemo(() => {
     if (kpi === 'completadas') return tareas.filter((tarea) => tarea.estado === 'completada');
     if (kpi === 'en_proceso') return tareas.filter((tarea) => tarea.estado === 'en_proceso');
@@ -412,10 +416,10 @@ function DashboardKpiDetalle({
     : [];
 
   const contadorProyecto = (target: Proyecto) => {
-    if (kpi === 'proyectos') return `${fases.filter((faseItem) => faseItem.proyectoId === target.id).length} fase(s)`;
-    if (kpi === 'semaforo') return `${alertas.filter((alerta) => alerta.proyectoId === target.id).length} alerta(s)`;
-    if (kpi === 'alertas') return `${alertas.filter((alerta) => alerta.proyectoId === target.id).length} alerta(s)`;
-    return `${tareasKpi.filter((tarea) => tarea.proyectoId === target.id).length} tarea(s)`;
+    if (kpi === 'proyectos') return `${fases.filter((faseItem) => faseItem.proyectoId === target.id).length} ${t('dash_level_phases').toLowerCase()}`;
+    if (kpi === 'semaforo') return `${alertas.filter((alerta) => alerta.proyectoId === target.id).length} ${t('dash_alert_count')}`;
+    if (kpi === 'alertas') return `${alertas.filter((alerta) => alerta.proyectoId === target.id).length} ${t('dash_alert_count')}`;
+    return `${tareasKpi.filter((tarea) => tarea.proyectoId === target.id).length} ${t('dash_task_count')}`;
   };
 
   const fasesOrdenadas = useMemo(() => {
@@ -434,22 +438,22 @@ function DashboardKpiDetalle({
         <div>
           <button className="mb-3 inline-flex items-center gap-2 text-sm font-medium text-slate-400 hover:text-white" onClick={onBack}>
             <ArrowLeft className="h-4 w-4" />
-            Volver al resumen
+            {t('dash_back_to_summary')}
           </button>
-          <p className="text-sm uppercase tracking-[0.18em] text-emerald-300">Detalle KPI</p>
-          <h2 className="mt-2 text-2xl font-semibold text-white sm:text-3xl">{kpiTitles[kpi]}</h2>
-          <p className="mt-2 max-w-2xl text-sm text-slate-400">{kpiDescriptions[kpi]}</p>
+          <p className="text-sm uppercase tracking-[0.18em] text-emerald-300">{t('dash_kpi_detail')}</p>
+          <h2 className="mt-2 text-2xl font-semibold text-white sm:text-3xl">{t(kpiTitleKeys[kpi])}</h2>
+          <p className="mt-2 max-w-2xl text-sm text-slate-400">{t(kpiDescKeys[kpi])}</p>
         </div>
         <div className="rounded-lg border border-white/10 bg-white/[0.035] px-4 py-3 text-right">
-          <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Nivel actual</p>
-          <p className="mt-1 font-semibold text-white">{fase ? 'Tareas' : proyecto ? 'Fases' : 'Proyectos'}</p>
+          <p className="text-xs uppercase tracking-[0.14em] text-slate-500">{t('dash_current_level')}</p>
+          <p className="mt-1 font-semibold text-white">{fase ? t('dash_level_tasks') : proyecto ? t('dash_level_phases') : t('dash_level_projects')}</p>
         </div>
       </div>
 
       {proyecto ? (
         <div className="mb-4 flex flex-wrap items-center gap-2 text-sm">
           <button className="rounded-lg border border-white/10 px-3 py-2 text-slate-300 hover:bg-white/8" onClick={() => onOpenProject(null)}>
-            Proyectos
+            {t('nav_proyectos')}
           </button>
           <span className="text-slate-600">/</span>
           <button className="rounded-lg border border-white/10 px-3 py-2 text-slate-300 hover:bg-white/8" onClick={() => onSelectPhase(null)}>
@@ -483,8 +487,8 @@ function DashboardKpiDetalle({
                         {isSemaforo ? <TrafficLightOrb estado={estado} size="sm" /> : null}
                         <h3 className="truncate font-semibold text-white">{item.nombre}</h3>
                       </div>
-                      <p className="mt-1 text-sm text-slate-500">{item.categoria} · Go live {item.fechaGoLive}</p>
-                      {isSemaforo ? <p className={`mt-2 text-xs font-semibold ${estado === 'rojo' ? 'text-red-200' : estado === 'amarillo' ? 'text-amber-200' : 'text-emerald-200'}`}>{semaforoText[estado]}</p> : null}
+                      <p className="mt-1 text-sm text-slate-500">{item.categoria} · {t('go_live_label')} {item.fechaGoLive}</p>
+                      {isSemaforo ? <p className={`mt-2 text-xs font-semibold ${estado === 'rojo' ? 'text-red-200' : estado === 'amarillo' ? 'text-amber-200' : 'text-emerald-200'}`}>{t(semaforoKeys[estado])}</p> : null}
                     </div>
                     <div className="flex items-center gap-4">
                       <div className="hidden min-w-36 sm:block">
@@ -494,8 +498,8 @@ function DashboardKpiDetalle({
                         </div>
                         <ProgressBar value={cumplimiento} tone={estado === 'rojo' ? 'red' : estado === 'amarillo' ? 'amber' : 'emerald'} />
                         <div className="mt-2 flex justify-between text-xs text-slate-500">
-                          <span>Plan {planificado}%</span>
-                          <span>Avance {avance}%</span>
+                          <span>{t('dash_plan')} {planificado}%</span>
+                          <span>{t('dash_progress')} {avance}%</span>
                         </div>
                       </div>
                       <span className={`rounded-full px-3 py-1 text-sm ${isSemaforo && alertasProyecto.length ? 'bg-amber-400/12 text-amber-100' : 'bg-white/8 text-slate-300'}`}>{contadorProyecto(item)}</span>
@@ -506,7 +510,7 @@ function DashboardKpiDetalle({
               );
             })
           ) : (
-            <EmptyKpiState text="No hay datos para este KPI." />
+            <EmptyKpiState text={t('dash_empty_kpi')} />
           )}
         </div>
       ) : null}
@@ -532,26 +536,26 @@ function DashboardKpiDetalle({
                       <span className="rounded-md bg-white/8 px-2 py-1 text-xs font-semibold text-emerald-200">{item.codigo}</span>
                     </div>
                     <h3 className="mt-3 font-semibold text-white">{item.nombre}</h3>
-                    <p className="mt-1 text-sm text-slate-500">{isSemaforo ? `${alertasFaseItem.length} alerta(s) · ${tareasFaseItem.length} tarea(s)` : `${count} ${kpi === 'alertas' ? 'alerta(s)' : 'tarea(s)'}`}</p>
-                    {isSemaforo ? <p className={`mt-2 text-xs font-semibold ${estado === 'rojo' ? 'text-red-200' : estado === 'amarillo' ? 'text-amber-200' : 'text-emerald-200'}`}>{semaforoText[estado]}</p> : null}
+                    <p className="mt-1 text-sm text-slate-500">{isSemaforo ? `${alertasFaseItem.length} ${t('dash_alert_count')} · ${tareasFaseItem.length} ${t('dash_task_count')}` : `${count} ${kpi === 'alertas' ? t('dash_alert_count') : t('dash_task_count')}`}</p>
+                    {isSemaforo ? <p className={`mt-2 text-xs font-semibold ${estado === 'rojo' ? 'text-red-200' : estado === 'amarillo' ? 'text-amber-200' : 'text-emerald-200'}`}>{t(semaforoKeys[estado])}</p> : null}
                   </div>
                   <ArrowRight className="h-5 w-5 text-slate-500" />
                 </div>
                 <div className="mt-4 mb-2 flex items-center justify-between text-sm">
-                  <span className="text-slate-400">{isSemaforo ? 'Cumplimiento Gantt' : 'Cumplimiento fase'}</span>
+                  <span className="text-slate-400">{isSemaforo ? t('dash_gantt_compliance') : t('dash_phase_compliance')}</span>
                   <span className="font-semibold text-white">{isSemaforo ? cumplimiento : pct}%</span>
                 </div>
                 <ProgressBar value={isSemaforo ? cumplimiento : pct} tone={isSemaforo ? (estado === 'rojo' ? 'red' : estado === 'amarillo' ? 'amber' : 'emerald') : pct === 100 ? 'emerald' : 'blue'} />
                 {isSemaforo ? (
                   <div className="mt-2 flex justify-between text-xs text-slate-500">
-                    <span>Plan {planificado}%</span>
-                    <span>Avance {pct}%</span>
+                    <span>{t('dash_plan')} {planificado}%</span>
+                    <span>{t('dash_progress')} {pct}%</span>
                   </div>
                 ) : null}
               </button>
             );
           }) : (
-            <EmptyKpiState text="Este proyecto no tiene fases asociadas al KPI seleccionado." />
+            <EmptyKpiState text={t('dash_empty_phases')} />
           )}
         </div>
       ) : null}
@@ -568,7 +572,7 @@ function DashboardKpiDetalle({
                       <div>
                         <span className="rounded-full bg-amber-400/12 px-2.5 py-1 text-xs font-medium text-amber-100">{alerta.tipo.replace('_', ' ')}</span>
                         <h3 className="mt-3 font-semibold text-white">{alerta.mensaje}</h3>
-                        <p className="mt-1 text-sm text-slate-500">{tarea?.nombre ?? 'Tarea no encontrada'}</p>
+                        <p className="mt-1 text-sm text-slate-500">{tarea?.nombre ?? t('dash_task_not_found')}</p>
                       </div>
                       <ArrowRight className="h-5 w-5 text-slate-500" />
                     </div>
@@ -585,14 +589,14 @@ function DashboardKpiDetalle({
                       <div className="min-w-0">
                         <div className="mb-2 flex flex-wrap items-center gap-2">
                           <StatusBadge estado={tarea.estado} ping={tarea.estado === 'bloqueada'} />
-                          {tarea.esMilestone ? <span className="rounded-full bg-amber-400/12 px-2.5 py-1 text-xs font-medium text-amber-100">Milestone</span> : null}
+                          {tarea.esMilestone ? <span className="rounded-full bg-amber-400/12 px-2.5 py-1 text-xs font-medium text-amber-100">{t('gantt_col_milestone')}</span> : null}
                         </div>
                         <h3 className="font-semibold text-white">{tarea.nombre}</h3>
-                        <p className="mt-1 text-sm text-slate-500">Responsable: {tarea.responsable}</p>
+                        <p className="mt-1 text-sm text-slate-500">{t('dash_responsible')}: {tarea.responsable}</p>
                       </div>
                       <div className="text-left text-sm text-slate-400 sm:text-right">
-                        <p>Inicio {tarea.fechaInicioPlan}</p>
-                        <p>Fin {tarea.fechaFinPlan}</p>
+                        <p>{t('dash_start')} {tarea.fechaInicioPlan}</p>
+                        <p>{t('dash_end')} {tarea.fechaFinPlan}</p>
                       </div>
                     </div>
                   </button>
@@ -600,7 +604,7 @@ function DashboardKpiDetalle({
               />
             )
           ) : (
-            <EmptyKpiState text="No hay tareas para esta fase." />
+            <EmptyKpiState text={t('dash_empty_tasks')} />
           )}
         </div>
       ) : null}

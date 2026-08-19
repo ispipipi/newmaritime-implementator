@@ -4,6 +4,8 @@ import { useAppStore } from '../../store/useAppStore';
 import { Tarea } from '../../types';
 import { alertaVisibleParaUsuario } from '../../utils/assignee';
 import { diasParaVencimiento } from '../../utils/taskHealth';
+import { useT } from '../../i18n/useT';
+import { DictKey } from '../../i18n/translations';
 import { TareaEditDrawer } from '../proyectos/TareaEditDrawer';
 import { GlassCard } from '../ui/GlassCard';
 
@@ -14,49 +16,49 @@ const normalizar = (value: string) =>
     .trim()
     .toLowerCase();
 
-const etiquetaTipoAlerta: Record<string, string> = {
-  vencida: 'Vencida',
-  proxima_vencer: 'Próxima',
-  bloqueada: 'Bloqueada',
-  en_riesgo: 'En riesgo',
-  reasignada: 'Reasignada',
-  solicitud_reasignacion: 'Por aceptar',
-  reasignacion_rechazada: 'Rechazada',
+const etiquetaTipoAlertaKeys: Record<string, DictKey> = {
+  vencida: 'alert_tipo_vencida',
+  proxima_vencer: 'alert_tipo_proxima',
+  bloqueada: 'alert_tipo_bloqueada',
+  en_riesgo: 'alert_tipo_en_riesgo',
+  reasignada: 'alert_tipo_reasignada',
+  solicitud_reasignacion: 'alert_tipo_por_aceptar',
+  reasignacion_rechazada: 'alert_tipo_rechazada',
 };
 
 type GrupoAlerta = 'criticas' | 'hoy' | 'proximas' | 'reasignadas' | 'otras';
 
 const grupoConfig: Record<
   GrupoAlerta,
-  { label: string; empty: string; accent: string; badge: string }
+  { labelKey: DictKey; emptyKey: DictKey; accent: string; badge: string }
 > = {
   criticas: {
-    label: 'Críticas',
-    empty: 'Sin alertas críticas.',
+    labelKey: 'alert_grupo_criticas',
+    emptyKey: 'alert_grupo_criticas_empty',
     accent: 'text-red-100',
     badge: 'bg-red-500 text-white',
   },
   hoy: {
-    label: 'Hoy',
-    empty: 'Sin alertas para hoy.',
+    labelKey: 'alert_grupo_hoy',
+    emptyKey: 'alert_grupo_hoy_empty',
     accent: 'text-amber-100',
     badge: 'bg-amber-400/15 text-amber-100',
   },
   proximas: {
-    label: 'Próximas',
-    empty: 'Sin alertas próximas.',
+    labelKey: 'alert_grupo_proximas',
+    emptyKey: 'alert_grupo_proximas_empty',
     accent: 'text-orange-100',
     badge: 'bg-orange-400/15 text-orange-100',
   },
   reasignadas: {
-    label: 'Reasignadas',
-    empty: 'Sin tareas reasignadas.',
+    labelKey: 'alert_grupo_reasignadas',
+    emptyKey: 'alert_grupo_reasignadas_empty',
     accent: 'text-blue-100',
     badge: 'bg-blue-400/15 text-blue-100',
   },
   otras: {
-    label: 'Otras',
-    empty: 'Sin otras alertas.',
+    labelKey: 'alert_grupo_otras',
+    emptyKey: 'alert_grupo_otras_empty',
     accent: 'text-slate-200',
     badge: 'bg-white/8 text-slate-200',
   },
@@ -64,6 +66,7 @@ const grupoConfig: Record<
 
 export function AlertPanel() {
   const { alertas, proyectos, tareas, marcarAlertaLeida, setVista, usuarioActivo } = useAppStore();
+  const t = useT();
   const [tareaSeleccionada, setTareaSeleccionada] = useState<Tarea | null>(null);
   const [grupoActivo, setGrupoActivo] = useState<'todas' | GrupoAlerta>('todas');
   const [gruposAbiertos, setGruposAbiertos] = useState<Set<GrupoAlerta>>(new Set(['criticas', 'hoy']));
@@ -152,7 +155,7 @@ export function AlertPanel() {
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Bell className="h-4 w-4 text-amber-300" />
-          <h3 className="font-semibold text-white">Alertas</h3>
+          <h3 className="font-semibold text-white">{t('alert_title')}</h3>
         </div>
         <span className="rounded-full bg-amber-400/15 px-2 py-0.5 text-xs text-amber-200">{pendientes.length}</span>
       </div>
@@ -163,7 +166,7 @@ export function AlertPanel() {
           onClick={() => setGrupoActivo('todas')}
           className={`rounded-lg border px-3 py-2 text-sm transition ${grupoActivo === 'todas' ? 'border-emerald-300/35 bg-emerald-400/12 text-emerald-100' : 'border-white/10 bg-white/[0.035] text-slate-300 hover:bg-white/8'}`}
         >
-          Todas
+          {t('alert_all')}
         </button>
         {(Object.keys(grupoConfig) as GrupoAlerta[]).map((grupo) => (
           <button
@@ -172,7 +175,7 @@ export function AlertPanel() {
             onClick={() => setGrupoActivo(grupo)}
             className={`rounded-lg border px-3 py-2 text-sm transition ${grupoActivo === grupo ? 'border-emerald-300/35 bg-emerald-400/12 text-emerald-100' : 'border-white/10 bg-white/[0.035] text-slate-300 hover:bg-white/8'}`}
           >
-            {grupoConfig[grupo].label} ({grupos[grupo].length})
+            {t(grupoConfig[grupo].labelKey)} ({grupos[grupo].length})
           </button>
         ))}
       </div>
@@ -195,7 +198,7 @@ export function AlertPanel() {
                 >
                   <div className="flex min-w-0 items-center gap-2">
                     {abierto ? <ChevronDown className="h-4 w-4 text-slate-500" /> : <ChevronRight className="h-4 w-4 text-slate-500" />}
-                    <span className={`font-semibold ${config.accent}`}>{config.label}</span>
+                    <span className={`font-semibold ${config.accent}`}>{t(config.labelKey)}</span>
                   </div>
                   <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${config.badge}`}>{items.length}</span>
                 </button>
@@ -223,22 +226,22 @@ export function AlertPanel() {
                 <button className="w-full text-left text-sm font-medium text-slate-100 hover:text-white" onClick={() => abrirAlerta(alerta)}>
                   <span className="mb-2 inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-semibold" style={esVencida ? { background: '#ef4444', color: '#ffffff' } : undefined}>
                     {esVencida ? <AlertTriangle className="h-3.5 w-3.5" /> : esReasignada ? <UserPlus className="h-3.5 w-3.5" /> : <Bell className="h-3.5 w-3.5" />}
-                    {etiquetaTipoAlerta[alerta.tipo] ?? alerta.tipo.replace(/_/g, ' ')}
+                    {etiquetaTipoAlertaKeys[alerta.tipo] ? t(etiquetaTipoAlertaKeys[alerta.tipo]) : alerta.tipo.replace(/_/g, ' ')}
                   </span>
                   {alerta.mensaje}
                 </button>
                 <div className="mt-2 flex items-center justify-between gap-3 text-xs text-slate-500">
-                  <span className="truncate">{proyecto?.nombre ?? 'Proyecto'}</span>
+                  <span className="truncate">{proyecto?.nombre ?? t('drill_project_fallback')}</span>
                   <button className="inline-flex items-center gap-1 text-emerald-300 hover:text-emerald-200" onClick={() => marcarAlertaLeida(alerta.id)}>
                     <Check className="h-3.5 w-3.5" />
-                    Leída
+                    {t('alert_read')}
                   </button>
                 </div>
               </div>
                       );
                     })
                     ) : (
-                      <p className="rounded-lg border border-white/8 bg-white/[0.035] p-3 text-sm text-slate-400">{config.empty}</p>
+                      <p className="rounded-lg border border-white/8 bg-white/[0.035] p-3 text-sm text-slate-400">{t(config.emptyKey)}</p>
                     )}
                   </div>
                 ) : null}
@@ -246,7 +249,7 @@ export function AlertPanel() {
             );
           })
         ) : (
-          <p className="rounded-lg border border-white/8 bg-white/[0.035] p-3 text-sm text-slate-400">Sin alertas pendientes.</p>
+          <p className="rounded-lg border border-white/8 bg-white/[0.035] p-3 text-sm text-slate-400">{t('alert_none_pending')}</p>
         )}
       </div>
       <TareaEditDrawer tarea={tareaSeleccionada} onClose={() => setTareaSeleccionada(null)} />

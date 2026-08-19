@@ -1,6 +1,7 @@
 import { Calendar, ChevronRight } from 'lucide-react';
 import { Fase, Tarea } from '../../types';
 import { useAppStore, calcCumplimientoGanttFase, calcPctFase, calcPctPlanificadoFase, semaforoCumplimientoFase } from '../../store/useAppStore';
+import { useT } from '../../i18n/useT';
 import { GlassCard } from '../ui/GlassCard';
 import { ProgressBar } from '../ui/ProgressBar';
 import { StatusBadge } from '../ui/StatusBadge';
@@ -13,6 +14,7 @@ type Props = {
 
 export function FaseCard({ fase, tareas }: Props) {
   const setVista = useAppStore((s) => s.setVista);
+  const t = useT();
   const pct = calcPctFase(fase.id, tareas);
   const cumplimiento = calcCumplimientoGanttFase(fase.id, tareas);
   const planificado = calcPctPlanificadoFase(fase.id, tareas);
@@ -41,13 +43,13 @@ export function FaseCard({ fase, tareas }: Props) {
           <StatusBadge estado={estado} />
         </div>
         <div className="mb-2 flex items-center justify-between text-sm">
-          <span className="text-slate-400">Cumplimiento Gantt</span>
+          <span className="text-slate-400">{t('dash_gantt_compliance')}</span>
           <span className="font-semibold text-white">{cumplimiento}%</span>
         </div>
         <ProgressBar value={cumplimiento} tone={semaforo === 'rojo' ? 'red' : semaforo === 'amarillo' ? 'amber' : 'emerald'} />
         <div className="mt-2 flex justify-between text-xs text-slate-500">
-          <span>{tareasFase.length} tareas</span>
-          <span>Plan {planificado}% · Avance {pct}%</span>
+          <span>{tareasFase.length} {t('proyecto_tasks_word')}</span>
+          <span>{t('dash_plan')} {planificado}% · {t('dash_progress')} {pct}%</span>
         </div>
       </button>
     </GlassCard>

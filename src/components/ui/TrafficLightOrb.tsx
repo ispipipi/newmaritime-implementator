@@ -1,9 +1,11 @@
 import { EstadoSemaforo } from '../../types';
+import { translate, Idioma, DictKey } from '../../i18n/translations';
+import { useAppStore } from '../../store/useAppStore';
 
-const orb = {
-  verde: { base: '#22c55e', glow: 'rgba(34,197,94,0.42)', label: 'Operación saludable' },
-  amarillo: { base: '#f59e0b', glow: 'rgba(245,158,11,0.42)', label: 'Requiere atención' },
-  rojo: { base: '#ef4444', glow: 'rgba(239,68,68,0.45)', label: 'Riesgo crítico' },
+const orb: Record<EstadoSemaforo, { base: string; glow: string; labelKey: DictKey }> = {
+  verde: { base: '#22c55e', glow: 'rgba(34,197,94,0.42)', labelKey: 'orb_verde' },
+  amarillo: { base: '#f59e0b', glow: 'rgba(245,158,11,0.42)', labelKey: 'orb_amarillo' },
+  rojo: { base: '#ef4444', glow: 'rgba(239,68,68,0.45)', labelKey: 'orb_rojo' },
 };
 
 type Props = {
@@ -19,13 +21,15 @@ const sizes = {
 };
 
 export function TrafficLightOrb({ estado, size = 'md', label }: Props) {
+  const idioma = useAppStore((s) => s.idioma) as Idioma;
   const cfg = orb[estado];
+  const defaultLabel = translate(cfg.labelKey, idioma);
   return (
     <div className="flex items-center gap-3">
       <span
         className={`relative inline-flex shrink-0 rounded-full ${sizes[size]}`}
-        title={label ?? cfg.label}
-        aria-label={label ?? cfg.label}
+        title={label ?? defaultLabel}
+        aria-label={label ?? defaultLabel}
       >
         <span
           className="absolute inset-0 rounded-full animate-ping opacity-30"

@@ -1,20 +1,22 @@
 import { ChevronRight, Home } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
+import { useT } from '../../i18n/useT';
 
 export function Breadcrumb() {
   const { vista, proyectos, fases, proyectoActivoId, faseActivaId, setVista } = useAppStore();
+  const t = useT();
   const proyecto = proyectos.find((p) => p.id === proyectoActivoId);
   const fase = fases.find((f) => f.id === faseActivaId);
 
   const items = [
-    { label: 'Dashboard', onClick: () => setVista('dashboard') },
-    vista === 'proyectos' ? { label: 'Proyectos', onClick: () => setVista('proyectos') } : null,
+    { label: t('breadcrumb_dashboard'), onClick: () => setVista('dashboard') },
+    vista === 'proyectos' ? { label: t('nav_proyectos'), onClick: () => setVista('proyectos') } : null,
     proyecto ? { label: proyecto.nombre, onClick: () => setVista('proyecto', proyecto.id) } : null,
     fase ? { label: fase.codigo, onClick: () => setVista('fase', proyecto?.id, fase.id) } : null,
-    vista === 'mis_tareas' ? { label: 'Mis tareas', onClick: () => setVista('mis_tareas') } : null,
-    vista === 'info_cliente' ? { label: 'Info cliente', onClick: () => setVista('info_cliente', proyecto?.id) } : null,
-    vista === 'gantt_admin' ? { label: 'Gantt admin', onClick: () => setVista('gantt_admin') } : null,
-    vista === 'ajustes' ? { label: 'Ajustes', onClick: () => setVista('ajustes') } : null,
+    vista === 'mis_tareas' ? { label: t('nav_mis_tareas'), onClick: () => setVista('mis_tareas') } : null,
+    vista === 'info_cliente' ? { label: t('nav_info_cliente'), onClick: () => setVista('info_cliente', proyecto?.id) } : null,
+    vista === 'gantt_admin' ? { label: t('nav_gantt_admin'), onClick: () => setVista('gantt_admin') } : null,
+    vista === 'ajustes' ? { label: t('nav_ajustes'), onClick: () => setVista('ajustes') } : null,
   ].filter(Boolean) as Array<{ label: string; onClick: () => void }>;
 
   return (

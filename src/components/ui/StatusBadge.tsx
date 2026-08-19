@@ -1,11 +1,13 @@
 import { EstadoTarea } from '../../types';
+import { translate, Idioma } from '../../i18n/translations';
+import { useAppStore } from '../../store/useAppStore';
 
-const labels: Record<EstadoTarea, string> = {
-  pendiente: 'Pendiente',
-  en_proceso: 'En proceso',
-  completada: 'Completada',
-  bloqueada: 'Bloqueada',
-  cancelada: 'Cancelada',
+const labelKeys: Record<EstadoTarea, Parameters<typeof translate>[0]> = {
+  pendiente: 'estado_pendiente',
+  en_proceso: 'estado_en_proceso',
+  completada: 'estado_completada',
+  bloqueada: 'estado_bloqueada',
+  cancelada: 'estado_cancelada',
 };
 
 const colors: Record<EstadoTarea, string> = {
@@ -25,13 +27,14 @@ const dot: Record<EstadoTarea, string> = {
 };
 
 export function StatusBadge({ estado, ping = false }: { estado: EstadoTarea; ping?: boolean }) {
+  const idioma = useAppStore((s) => s.idioma) as Idioma;
   return (
     <span className={`inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs font-medium ring-1 ${colors[estado]}`}>
       <span className="relative flex h-2 w-2">
         {ping ? <span className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-60 ${dot[estado]}`} /> : null}
         <span className={`relative inline-flex h-2 w-2 rounded-full ${dot[estado]}`} />
       </span>
-      {labels[estado]}
+      {translate(labelKeys[estado], idioma)}
     </span>
   );
 }

@@ -5,6 +5,8 @@ import { Tarea } from '../../types';
 import { normalizarResponsable, responsableAsignadoAUsuario } from '../../utils/assignee';
 import { diasParaVencimiento, diasVencida, tareaEstaVencida, tareaVenceHoy, tareaVencePronto } from '../../utils/taskHealth';
 import { usePermisos } from '../../hooks/usePermisos';
+import { useT } from '../../i18n/useT';
+import { translate, DictKey, Idioma } from '../../i18n/translations';
 import { GlassCard } from '../ui/GlassCard';
 import { ProgressBar } from '../ui/ProgressBar';
 import { StatusBadge } from '../ui/StatusBadge';
@@ -26,20 +28,20 @@ const estadoPrioridad: Record<Tarea['estado'], number> = {
   completada: 5,
 };
 const estadosOrden = ['vencida', 'bloqueada', 'en_proceso', 'pendiente', 'cancelada', 'completada'];
-const estadoLabels: Record<string, string> = {
-  vencida: 'Vencidas',
-  bloqueada: 'Bloqueadas',
-  en_proceso: 'En proceso',
-  pendiente: 'Pendientes',
-  completada: 'Completadas',
-  cancelada: 'Canceladas',
+const estadoLabelKeys: Record<string, DictKey> = {
+  vencida: 'status_vencidas',
+  bloqueada: 'status_bloqueadas',
+  en_proceso: 'status_en_proceso',
+  pendiente: 'status_pendientes',
+  completada: 'status_completadas',
+  cancelada: 'status_canceladas',
 };
-const accionEstado: Record<Tarea['estado'], { next: Tarea['estado']; label: string }> = {
-  pendiente: { next: 'en_proceso', label: 'Iniciar' },
-  en_proceso: { next: 'completada', label: 'Completar' },
-  completada: { next: 'pendiente', label: 'Reabrir' },
-  bloqueada: { next: 'en_proceso', label: 'Reactivar' },
-  cancelada: { next: 'pendiente', label: 'Reabrir' },
+const accionEstadoKeys: Record<Tarea['estado'], { next: Tarea['estado']; labelKey: DictKey }> = {
+  pendiente: { next: 'en_proceso', labelKey: 'accion_iniciar' },
+  en_proceso: { next: 'completada', labelKey: 'accion_completar' },
+  completada: { next: 'pendiente', labelKey: 'accion_reabrir' },
+  bloqueada: { next: 'en_proceso', labelKey: 'accion_reactivar' },
+  cancelada: { next: 'pendiente', labelKey: 'accion_reabrir' },
 };
 
 const toggleSet = (set: Set<string>, id: string) => {
@@ -115,6 +117,7 @@ function QuickReassignPanel({
 }) {
   const { usuarioActivo, solicitarReasignacionTarea, resolverReasignacionTarea } = useAppStore();
   const { puedeEditarDatosTarea, esComercial, esRexPlus } = usePermisos();
+  const t = useT();
   const [open, setOpen] = useState(false);
   const [nuevoResponsable, setNuevoResponsable] = useState('');
   const [motivo, setMotivo] = useState('');
@@ -154,7 +157,7 @@ function QuickReassignPanel({
   const enviarSolicitud = () => {
     if (!usuarioActivo) return;
     if (!nuevoResponsable.trim() || !motivo.trim()) {
-      setMensaje('Selecciona responsable y deja el motivo.');
+      setMensaje(t('drill_select_responsible_reason'));
       return;
     }
 
@@ -166,7 +169,7 @@ function QuickReassignPanel({
     });
     setNuevoResponsable('');
     setMotivo('');
-    setMensaje(`Solicitud enviada a ${nuevoResponsable}.`);
+    setMensaje(`${t('drill_request_sent')} ${nuevoResponsable}.`);
     setOpen(false);
   };
 
@@ -177,14 +180,14 @@ function QuickReassignPanel({
       accion: 'aceptar',
       usuario: usuarioActivo.nombre,
     });
-    setMensaje('Reasignación aceptada.');
+    setMensaje(t('drill_reassign_accepted'));
     setOpen(false);
   };
 
   const rechazar = () => {
     if (!usuarioActivo) return;
     if (!motivoRechazo.trim()) {
-      setMensaje('Para rechazar, necesitamos el motivo.');
+      setMensaje(t('drill_reject_need_reason'));
       return;
     }
     resolverReasignacionTarea({
@@ -194,7 +197,7 @@ function QuickReassignPanel({
       motivo: motivoRechazo,
     });
     setMotivoRechazo('');
-    setMensaje('Rechazo enviado al solicitante.');
+    setMensaje(t('drill_reject_sent'));
     setOpen(false);
   };
 
@@ -204,14 +207,14 @@ function QuickReassignPanel({
         {solicitud ? (
           <div className="flex flex-wrap items-center gap-2">
             <span className={`rounded-full px-2.5 py-1 font-semibold ${hayPendiente ? 'bg-sky-400/15 text-sky-100' : 'bg-red-500/15 text-red-100'}`}>
-              {hayPendiente ? 'Reasignación pendiente' : 'Reasignación rechazada'}
+              {hayPendiente ? t('drill_reassign_pending') : t('drill_reassign_rejected')}
             </span>
             <span className="text-slate-300">
               {solicitud.solicitante} → {solicitud.destinatario}
             </span>
           </div>
         ) : (
-          <span className="rounded-full bg-sky-400/15 px-2.5 py-1 font-semibold text-sky-100">Solicitar reasignación</span>
+          <span className="rounded-full bg-sky-400/15 px-2.5 py-1 font-semibold text-sky-100">{t('drill_request_reassign')}</span>
         )}
         {puedeSolicitar && !hayPendiente ? (
           <button
@@ -220,7 +223,7 @@ function QuickReassignPanel({
             className="inline-flex items-center gap-1.5 rounded-lg border border-sky-300/20 px-2.5 py-1.5 text-[11px] font-semibold text-sky-100 hover:bg-sky-400/10"
           >
             <ArrowRightLeft className="h-3.5 w-3.5" />
-            {open ? 'Ocultar' : solicitud?.estado === 'rechazada' ? 'Reintentar' : 'Abrir'}
+            {open ? t('drill_hide') : solicitud?.estado === 'rechazada' ? t('drill_retry') : t('drill_open')}
           </button>
         ) : null}
       </div>
@@ -229,11 +232,11 @@ function QuickReassignPanel({
         <div className="space-y-2">
           <p className="text-sm text-slate-200">{solicitud.motivo}</p>
           <p className="text-xs text-slate-400">
-            {hayPendiente ? `Solicitada ${formatFechaCorta(solicitud.solicitadaEn)}` : `Respondida ${formatFechaCorta(solicitud.respondidaEn ?? solicitud.solicitadaEn)}`}
+            {hayPendiente ? `${t('drill_request_reassign')} ${formatFechaCorta(solicitud.solicitadaEn)}` : `${formatFechaCorta(solicitud.respondidaEn ?? solicitud.solicitadaEn)}`}
           </p>
           {solicitud.estado === 'rechazada' && solicitud.respuesta ? (
             <p className="rounded-lg border border-red-300/20 bg-red-500/10 px-3 py-2 text-xs text-red-100">
-              Motivo rechazo: {solicitud.respuesta}
+              {t('drill_reject_reason_label')} {solicitud.respuesta}
             </p>
           ) : null}
 
@@ -241,7 +244,7 @@ function QuickReassignPanel({
             <div className="space-y-2">
               <textarea
                 className="min-h-20 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
-                placeholder="Si vas a rechazar, explica por qué."
+                placeholder={t('drill_reject_placeholder')}
                 value={motivoRechazo}
                 onChange={(event) => setMotivoRechazo(event.target.value)}
               />
@@ -252,7 +255,7 @@ function QuickReassignPanel({
                   className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-400 px-3 py-2 text-xs font-semibold text-slate-950 hover:bg-emerald-300"
                 >
                   <UserPlus className="h-3.5 w-3.5" />
-                  Aceptar
+                  {t('drill_accept')}
                 </button>
                 <button
                   type="button"
@@ -260,12 +263,12 @@ function QuickReassignPanel({
                   className="inline-flex items-center gap-1.5 rounded-lg border border-red-300/35 bg-red-500/12 px-3 py-2 text-xs font-semibold text-red-100 hover:bg-red-500/18"
                 >
                   <XCircle className="h-3.5 w-3.5" />
-                  Rechazar
+                  {t('drill_reject')}
                 </button>
               </div>
             </div>
           ) : hayPendiente && usuarioEsSolicitante ? (
-            <p className="text-xs text-sky-100">Esperando respuesta de {solicitud.destinatario}.</p>
+            <p className="text-xs text-sky-100">{t('drill_waiting_response_from')} {solicitud.destinatario}.</p>
           ) : null}
         </div>
       ) : open && puedeSolicitar ? (
@@ -275,7 +278,7 @@ function QuickReassignPanel({
             value={nuevoResponsable}
             onChange={(event) => setNuevoResponsable(event.target.value)}
           >
-            <option value="">Selecciona responsable</option>
+            <option value="">{t('drill_select_responsible')}</option>
             {opciones.map((persona) => (
               <option key={persona} value={persona}>
                 {persona}
@@ -284,7 +287,7 @@ function QuickReassignPanel({
           </select>
           <textarea
             className="min-h-20 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
-            placeholder="Explica por qué esta tarea debería pasar a otra persona."
+            placeholder={t('drill_reassign_placeholder')}
             value={motivo}
             onChange={(event) => setMotivo(event.target.value)}
           />
@@ -295,14 +298,14 @@ function QuickReassignPanel({
               className="inline-flex items-center gap-1.5 rounded-lg bg-sky-300 px-3 py-2 text-xs font-semibold text-slate-950 hover:bg-sky-200"
             >
               <Send className="h-3.5 w-3.5" />
-              Enviar solicitud
+              {t('drill_send_request')}
             </button>
             <button
               type="button"
               onClick={() => setOpen(false)}
               className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-slate-300 hover:bg-white/8"
             >
-              Cancelar
+              {t('drill_cancel')}
             </button>
           </div>
         </div>
@@ -338,6 +341,7 @@ export function TaskStatusGroups({
   renderTask: (tarea: Tarea) => ReactNode;
   scopeId: string;
 }) {
+  const idioma = useAppStore((s) => s.idioma) as Idioma;
   const [openStatuses, setOpenStatuses] = useState<Set<string>>(new Set());
   const groups = useMemo(() => {
     return estadosOrden
@@ -345,12 +349,12 @@ export function TaskStatusGroups({
         const key = String(estado);
         return {
           key,
-          label: estadoLabels[key] ?? key,
+          label: estadoLabelKeys[key] ? translate(estadoLabelKeys[key], idioma) : key,
           tareas: tareas.filter((tarea) => estadoAgrupacion(tarea) === key),
         };
       })
       .filter((group) => group.tareas.length);
-  }, [tareas]);
+  }, [tareas, idioma]);
 
   if (!groups.length) return null;
 
@@ -382,6 +386,7 @@ export function TaskStatusGroups({
 export function TareasDrilldown({ tareas, showProjectLevel = true, query = '', sortMode = 'criticas' }: Props) {
   const { proyectos, fases, actualizarTarea, usuarioActivo, tareaActivaId, setTareaActiva, perfiles, ejecutivos } = useAppStore();
   const { puedeCambiarEstadoTarea, puedeEditarDatosTarea, esComercial, esRexPlus } = usePermisos();
+  const t = useT();
   const [selected, setSelected] = useState<Tarea | null>(null);
   const normalized = query.trim().toLowerCase();
   const personasAsignables = useMemo(() => {
@@ -455,7 +460,7 @@ export function TareasDrilldown({ tareas, showProjectLevel = true, query = '', s
     const overdueDays = diasVencida(tarea);
     const reasignacionPendiente = tarea.reasignacionPendiente?.estado === 'pendiente';
     const reasignacionRechazada = tarea.reasignacionPendiente?.estado === 'rechazada';
-    const accion = accionEstado[tarea.estado];
+    const accion = accionEstadoKeys[tarea.estado];
     const puedeCambiarEstaTarea =
       !!usuarioActivo &&
       puedeCambiarEstadoTarea &&
@@ -505,44 +510,44 @@ export function TareasDrilldown({ tareas, showProjectLevel = true, query = '', s
                 {vencida ? (
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-red-500 px-2.5 py-1 text-xs font-semibold text-white">
                     <AlertTriangle className="h-3.5 w-3.5" />
-                    Vencida {overdueDays}d
+                    {t('drill_overdue')} {overdueDays}{t('drill_days_short')}
                   </span>
                 ) : null}
-                {tarea.esMilestone ? <span className="rounded-full bg-amber-400/12 px-2.5 py-1 text-xs font-medium text-amber-100">Milestone</span> : null}
+                {tarea.esMilestone ? <span className="rounded-full bg-amber-400/12 px-2.5 py-1 text-xs font-medium text-amber-100">{t('gantt_col_milestone')}</span> : null}
                 {reasignacionPendiente ? (
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-sky-400/18 px-2.5 py-1 text-xs font-semibold text-sky-50 shadow-[0_0_18px_rgba(56,189,248,0.2)]">
                     <span className="h-2 w-2 rounded-full bg-sky-200 animate-pulse" />
-                    Reasignación pendiente
+                    {t('drill_reassign_pending')}
                   </span>
                 ) : null}
                 {reasignacionRechazada ? (
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-red-500/18 px-2.5 py-1 text-xs font-semibold text-red-50 shadow-[0_0_18px_rgba(239,68,68,0.18)]">
                     <span className="h-2 w-2 rounded-full bg-red-200" />
-                    Reasignación rechazada
+                    {t('drill_reassign_rejected')}
                   </span>
                 ) : null}
               </div>
               <h4 className="line-clamp-2 text-sm font-semibold text-white transition group-hover:text-emerald-100">{tarea.nombre}</h4>
               <p className="mt-1 truncate text-xs text-slate-400">
-                {showProjectLevel ? null : <span>{proyecto?.nombre ?? 'Proyecto'} · </span>}
+                {showProjectLevel ? null : <span>{proyecto?.nombre ?? t('drill_project_fallback')} · </span>}
                 {tarea.responsable}
               </p>
               {reasignacionPendiente && tarea.reasignacionPendiente ? (
                 <p className="mt-2 inline-flex max-w-full items-center gap-2 rounded-lg border border-sky-300/20 bg-sky-400/10 px-2.5 py-1.5 text-xs text-sky-100">
                   <ArrowRightLeft className="h-3.5 w-3.5 shrink-0" />
-                  Esperando respuesta de {tarea.reasignacionPendiente.destinatario}
+                  {t('drill_waiting_response_from')} {tarea.reasignacionPendiente.destinatario}
                 </p>
               ) : null}
               {reasignacionRechazada && tarea.reasignacionPendiente?.respuesta ? (
                 <p className="mt-2 line-clamp-2 rounded-lg border border-red-300/15 bg-red-500/8 px-2.5 py-1.5 text-xs text-red-100">
-                  Rechazo: {tarea.reasignacionPendiente.respuesta}
+                  {t('drill_reject_reason_label')} {tarea.reasignacionPendiente.respuesta}
                 </p>
               ) : null}
             </div>
             <div className={`text-left text-xs sm:text-right ${vencida ? 'text-red-100' : 'text-slate-400'}`}>
-              {vencida ? <p className="mb-1 font-semibold uppercase tracking-[0.12em] text-red-200">Urgente</p> : null}
-              {reasignacionPendiente ? <p className="mb-1 font-semibold uppercase tracking-[0.12em] text-sky-200">Por aceptar</p> : null}
-              {reasignacionRechazada ? <p className="mb-1 font-semibold uppercase tracking-[0.12em] text-red-200">Devuelta</p> : null}
+              {vencida ? <p className="mb-1 font-semibold uppercase tracking-[0.12em] text-red-200">{t('drill_urgent')}</p> : null}
+              {reasignacionPendiente ? <p className="mb-1 font-semibold uppercase tracking-[0.12em] text-sky-200">{t('drill_to_accept')}</p> : null}
+              {reasignacionRechazada ? <p className="mb-1 font-semibold uppercase tracking-[0.12em] text-red-200">{t('drill_returned')}</p> : null}
               <p>{tarea.fechaInicioPlan}</p>
               <p>{tarea.fechaFinPlan}</p>
             </div>
@@ -552,9 +557,9 @@ export function TareasDrilldown({ tareas, showProjectLevel = true, query = '', s
           {tarea.observacion || tarea.comentarios?.length ? (
             <span className="inline-flex items-center gap-1 text-emerald-200">
               <MessageSquare className="h-3.5 w-3.5" />
-              {tarea.comentarios?.length ? `${tarea.comentarios.length} mensaje(s)` : 'Con notas'}
+              {tarea.comentarios?.length ? `${tarea.comentarios.length} ${t('drill_messages')}` : t('drill_with_notes')}
             </span>
-          ) : <span>{tarea.duracionDias} dia(s)</span>}
+          ) : <span>{tarea.duracionDias} {t('drill_days')}</span>}
           <button
             disabled={!puedeCambiarEstaTarea}
             className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-300/20 px-2.5 py-1.5 text-xs font-semibold text-emerald-100 hover:bg-emerald-400/10 disabled:cursor-not-allowed disabled:opacity-45"
@@ -562,7 +567,7 @@ export function TareasDrilldown({ tareas, showProjectLevel = true, query = '', s
             type="button"
           >
             <StepForward className="h-3.5 w-3.5" />
-            {accion.label}
+            {t(accion.labelKey)}
           </button>
         </div>
         <div className="mt-2 flex flex-wrap gap-2">
@@ -572,7 +577,7 @@ export function TareasDrilldown({ tareas, showProjectLevel = true, query = '', s
             className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-2.5 py-1.5 text-xs font-semibold text-slate-300 hover:bg-white/8"
           >
             <MessageSquare className="h-3.5 w-3.5" />
-            Abrir ficha
+            {t('drill_open_sheet')}
           </button>
         </div>
         {puedeReasignarRapido ? <QuickReassignPanel tarea={tarea} personasAsignables={personasAsignables} /> : null}
@@ -600,7 +605,7 @@ export function TareasDrilldown({ tareas, showProjectLevel = true, query = '', s
                   <div className="min-w-0">
                     <p className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-300">{fase.codigo}</p>
                     <h3 className="truncate font-semibold text-white">{fase.nombre}</h3>
-                    <p className="mt-1 text-sm text-slate-500">{tareasFase.length} tarea(s)</p>
+                    <p className="mt-1 text-sm text-slate-500">{tareasFase.length} {t('dash_task_count')}</p>
                   </div>
                 </div>
                 <div className="hidden min-w-36 sm:block">
@@ -624,7 +629,7 @@ export function TareasDrilldown({ tareas, showProjectLevel = true, query = '', s
     return (
       <GlassCard className="p-6 text-center text-slate-400">
         <Search className="mx-auto mb-3 h-5 w-5 text-slate-500" />
-        No hay tareas para mostrar con los filtros actuales.
+        {t('drill_no_tasks')}
       </GlassCard>
     );
   }
@@ -664,12 +669,12 @@ export function TareasDrilldown({ tareas, showProjectLevel = true, query = '', s
                   </div>
                   <div className="min-w-0">
                     <h2 className="truncate text-lg font-semibold text-white">{proyecto.nombre}</h2>
-                    <p className="mt-1 text-sm text-slate-500">{tareasProyecto.length} tarea(s) visibles</p>
+                    <p className="mt-1 text-sm text-slate-500">{tareasProyecto.length} {t('drill_tasks_visible')}</p>
                   </div>
                 </div>
                 <div className="hidden min-w-44 sm:block">
                   <div className="mb-1 flex justify-between text-sm">
-                    <span className="text-slate-400">Avance</span>
+                    <span className="text-slate-400">{t('drill_progress')}</span>
                     <span className="font-semibold text-white">{pct}%</span>
                   </div>
                   <ProgressBar value={pct} tone={pct === 100 ? 'emerald' : 'blue'} />
@@ -679,7 +684,7 @@ export function TareasDrilldown({ tareas, showProjectLevel = true, query = '', s
                 <div className="border-t border-white/10 p-4">
                   <div className="mb-3 flex items-center gap-2 text-sm font-medium text-slate-300">
                     <ListChecks className="h-4 w-4 text-emerald-300" />
-                    Fases y tareas
+                    {t('drill_phases_and_tasks')}
                   </div>
                   {renderPhases(proyecto.id)}
                 </div>

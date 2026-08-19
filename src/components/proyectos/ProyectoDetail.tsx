@@ -4,6 +4,7 @@ import { usePermisos } from '../../hooks/usePermisos';
 import { useAppStore, calcCumplimientoGanttProyecto, calcPctProyecto, semaforoCumplimientoProyecto } from '../../store/useAppStore';
 import { Proyecto } from '../../types';
 import { getClientInfo } from '../../utils/clientInfo';
+import { useT } from '../../i18n/useT';
 import { AlertPanel } from '../layout/AlertPanel';
 import { GanttView } from '../gantt/GanttView';
 import { GlassCard } from '../ui/GlassCard';
@@ -21,6 +22,7 @@ export function ProyectoDetail() {
   const [tab, setTab] = useState<Tab>('fases');
   const [editing, setEditing] = useState<Proyecto | null>(null);
   const { puedeEditarProyectos } = usePermisos();
+  const t = useT();
   const proyecto = proyectos.find((p) => p.id === proyectoActivoId);
   const fasesProyecto = useMemo(() => fases.filter((f) => f.proyectoId === proyectoActivoId).sort((a, b) => a.orden - b.orden), [fases, proyectoActivoId]);
   const tareasProyecto = tareas.filter((t) => t.proyectoId === proyectoActivoId);
@@ -36,9 +38,9 @@ export function ProyectoDetail() {
   if (!proyecto) {
     return (
       <GlassCard className="p-6">
-        <p className="text-slate-300">Proyecto no encontrado.</p>
+        <p className="text-slate-300">{t('proyecto_not_found')}</p>
         <button className="mt-4 rounded-lg bg-emerald-400 px-4 py-2 font-semibold text-slate-950" onClick={() => setVista('proyectos')}>
-          Volver a proyectos
+          {t('proyecto_back_to_projects')}
         </button>
       </GlassCard>
     );
@@ -48,6 +50,14 @@ export function ProyectoDetail() {
   const cumplimiento = calcCumplimientoGanttProyecto(proyecto.id, tareas);
   const estado = semaforoCumplimientoProyecto(proyecto.id, tareas);
   const info = getClientInfo(proyecto);
+
+  const tabs: [Tab, typeof LayoutGrid, string][] = [
+    ['fases', LayoutGrid, t('proyecto_tab_fases')],
+    ['tareas', ListChecks, t('proyecto_tab_todas_tareas')],
+    ['gantt', TimerReset, t('proyecto_tab_gantt')],
+    ['expediente', FolderArchive, t('proyecto_tab_expediente')],
+    ['alertas', AlertTriangle, t('proyecto_tab_alertas')],
+  ];
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -63,18 +73,18 @@ export function ProyectoDetail() {
               {puedeEditarProyectos ? (
                 <button className="inline-flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-200 hover:bg-white/8" onClick={() => setEditing(proyecto)}>
                   <Edit3 className="h-4 w-4" />
-                  Editar
+                  {t('proyecto_edit')}
                 </button>
               ) : null}
               <button className="inline-flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-200 hover:bg-white/8" onClick={() => setVista('info_cliente', proyecto.id)}>
                 <Building2 className="h-4 w-4" />
-                Info cliente
+                {t('nav_info_cliente')}
               </button>
             </div>
             <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-slate-300">
               <span className="inline-flex items-center gap-2">
                 <CalendarDays className="h-4 w-4 text-slate-500" />
-                {proyecto.fechaInicio} a {proyecto.fechaGoLive}
+                {proyecto.fechaInicio} — {proyecto.fechaGoLive}
               </span>
               <span className="rounded-full bg-white/8 px-3 py-1 text-xs text-slate-300">{proyecto.estado}</span>
             </div>
@@ -93,16 +103,10 @@ export function ProyectoDetail() {
       </GlassCard>
 
       <div className="flex flex-wrap gap-2">
-        {[
-          ['fases', LayoutGrid, 'Fases'],
-          ['tareas', ListChecks, 'Todas las tareas'],
-          ['gantt', TimerReset, 'Gantt'],
-          ['expediente', FolderArchive, 'Expediente'],
-          ['alertas', AlertTriangle, 'Alertas'],
-        ].map(([id, Icon, label]) => (
-          <button key={id as string} className={`inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium ${tab === id ? 'border-emerald-300/40 bg-emerald-300/12 text-emerald-100' : 'border-white/10 text-slate-300 hover:bg-white/8'}`} onClick={() => setTab(id as Tab)}>
+        {tabs.map(([id, Icon, label]) => (
+          <button key={id} className={`inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium ${tab === id ? 'border-emerald-300/40 bg-emerald-300/12 text-emerald-100' : 'border-white/10 text-slate-300 hover:bg-white/8'}`} onClick={() => setTab(id)}>
             <Icon className="h-4 w-4" />
-            {label as string}
+            {label}
           </button>
         ))}
       </div>
@@ -114,7 +118,7 @@ export function ProyectoDetail() {
             <h2 className="text-2xl font-semibold text-white">{faseActiva.nombre}</h2>
           </div>
           <button className="rounded-lg border border-white/10 px-4 py-2 text-sm text-slate-300 hover:bg-white/8" onClick={() => setVista('proyecto', proyecto.id)}>
-            Ver todas las fases
+            {t('proyecto_view_all_phases')}
           </button>
         </div>
       ) : null}
@@ -123,7 +127,7 @@ export function ProyectoDetail() {
         <div className="space-y-4">
           <div className="flex items-center gap-2 text-slate-300">
             <ListChecks className="h-5 w-5 text-emerald-300" />
-            {tareasFase.length} tareas {faseActiva ? 'en esta fase' : 'del proyecto'}
+            {tareasFase.length} {t('proyecto_tasks_word')} {faseActiva ? t('proyecto_tasks_in_phase') : t('proyecto_tasks_in_project')}
           </div>
           <TareasList tareas={tareasFase} />
         </div>
@@ -141,7 +145,7 @@ export function ProyectoDetail() {
         <div className="space-y-4">
           <div className="flex items-center gap-2 text-slate-300">
             <ListChecks className="h-5 w-5 text-emerald-300" />
-            {tareasFase.length} tareas en esta fase
+            {tareasFase.length} {t('proyecto_tasks_word')} {t('proyecto_tasks_in_phase')}
           </div>
           <TareasList tareas={tareasFase} />
         </div>

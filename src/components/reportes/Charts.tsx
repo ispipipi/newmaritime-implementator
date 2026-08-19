@@ -14,14 +14,17 @@ import {
 } from 'recharts';
 import { EstadoTarea, Proyecto, Tarea } from '../../types';
 import { calcPctProyecto } from '../../store/useAppStore';
+import { useAppStore } from '../../store/useAppStore';
+import { translate, Idioma, DictKey } from '../../i18n/translations';
+import { useT } from '../../i18n/useT';
 import { GlassCard } from '../ui/GlassCard';
 
-const estadoLabels: Record<EstadoTarea, string> = {
-  pendiente: 'Pendiente',
-  en_proceso: 'En proceso',
-  completada: 'Completada',
-  bloqueada: 'Bloqueada',
-  cancelada: 'Cancelada',
+const estadoLabelKeys: Record<EstadoTarea, DictKey> = {
+  pendiente: 'estado_pendiente',
+  en_proceso: 'estado_en_proceso',
+  completada: 'estado_completada',
+  bloqueada: 'estado_bloqueada',
+  cancelada: 'estado_cancelada',
 };
 
 const colors: Record<EstadoTarea, string> = {
@@ -33,8 +36,10 @@ const colors: Record<EstadoTarea, string> = {
 };
 
 export function Charts({ proyectos, tareas }: { proyectos: Proyecto[]; tareas: Tarea[] }) {
-  const estados = Object.keys(estadoLabels).map((estado) => ({
-    name: estadoLabels[estado as EstadoTarea],
+  const idioma = useAppStore((s) => s.idioma) as Idioma;
+  const t = useT();
+  const estados = Object.keys(estadoLabelKeys).map((estado) => ({
+    name: translate(estadoLabelKeys[estado as EstadoTarea], idioma),
     value: tareas.filter((t) => t.estado === estado).length,
     estado: estado as EstadoTarea,
   }));
@@ -55,7 +60,7 @@ export function Charts({ proyectos, tareas }: { proyectos: Proyecto[]; tareas: T
   return (
     <div className="grid gap-4 xl:grid-cols-3">
       <GlassCard className="p-5 xl:col-span-2">
-        <h3 className="mb-4 font-semibold text-white">Avance por proyecto</h3>
+        <h3 className="mb-4 font-semibold text-white">{t('charts_progress_by_project')}</h3>
         <div className="h-72">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={avance}>
@@ -72,7 +77,7 @@ export function Charts({ proyectos, tareas }: { proyectos: Proyecto[]; tareas: T
       </GlassCard>
 
       <GlassCard className="p-5">
-        <h3 className="mb-4 font-semibold text-white">Estado de tareas</h3>
+        <h3 className="mb-4 font-semibold text-white">{t('charts_task_status')}</h3>
         <div className="h-72">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
@@ -88,7 +93,7 @@ export function Charts({ proyectos, tareas }: { proyectos: Proyecto[]; tareas: T
       </GlassCard>
 
       <GlassCard className="p-5 xl:col-span-3">
-        <h3 className="mb-4 font-semibold text-white">Curva de avance hacia go live</h3>
+        <h3 className="mb-4 font-semibold text-white">{t('charts_curve_to_golive')}</h3>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={linea}>

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { usePermisos, useProyectosVisibles } from '../../hooks/usePermisos';
 import { useAppStore, calcCumplimientoGanttProyecto, calcPctPlanificadoProyecto, calcPctProyecto, semaforoCumplimientoProyecto } from '../../store/useAppStore';
 import { Proyecto } from '../../types';
+import { useT } from '../../i18n/useT';
 import { GlassCard } from '../ui/GlassCard';
 import { ProgressBar } from '../ui/ProgressBar';
 import { TrafficLightOrb } from '../ui/TrafficLightOrb';
@@ -12,14 +13,15 @@ export function ProyectosList() {
   const proyectos = useProyectosVisibles();
   const { tareas, setVista } = useAppStore();
   const { puedeEditarProyectos } = usePermisos();
+  const t = useT();
   const [editing, setEditing] = useState<Proyecto | null>(null);
 
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-sm uppercase tracking-[0.18em] text-emerald-300">Portafolio</p>
-          <h1 className="mt-2 text-3xl font-semibold text-white">Proyectos de implementación</h1>
+          <p className="text-sm uppercase tracking-[0.18em] text-emerald-300">{t('proyectos_portfolio_badge')}</p>
+          <h1 className="mt-2 text-3xl font-semibold text-white">{t('proyectos_title')}</h1>
         </div>
       </div>
 
@@ -41,7 +43,7 @@ export function ProyectosList() {
                   <div className="flex items-center gap-3">
                     <TrafficLightOrb estado={estado} size="md" />
                     {puedeEditarProyectos ? (
-                      <button className="rounded-lg border border-white/10 p-2 text-slate-300 hover:bg-white/8" onClick={() => setEditing(proyecto)} aria-label={`Editar ${proyecto.nombre}`}>
+                      <button className="rounded-lg border border-white/10 p-2 text-slate-300 hover:bg-white/8" onClick={() => setEditing(proyecto)} aria-label={`${t('proyectos_edit_aria')} ${proyecto.nombre}`}>
                         <Edit3 className="h-4 w-4" />
                       </button>
                     ) : null}
@@ -51,22 +53,22 @@ export function ProyectosList() {
                 <div className="mb-5 grid gap-3 text-sm text-slate-300">
                   <span className="inline-flex items-center gap-2">
                     <CalendarDays className="h-4 w-4 text-slate-500" />
-                    {proyecto.fechaInicio} a {proyecto.fechaGoLive}
+                    {proyecto.fechaInicio} — {proyecto.fechaGoLive}
                   </span>
-                  <span>Categoría: {proyecto.categoria}</span>
+                  <span>{t('proyectos_category_label')}: {proyecto.categoria}</span>
                 </div>
 
                 <div className="mt-auto">
                   <div className="mb-2 flex items-center justify-between text-sm">
-                    <span className="text-slate-400">Cumplimiento Gantt</span>
+                    <span className="text-slate-400">{t('dash_gantt_compliance')}</span>
                     <span className="font-semibold text-white">{cumplimiento}%</span>
                   </div>
                   <ProgressBar value={cumplimiento} tone={estado === 'rojo' ? 'red' : estado === 'amarillo' ? 'amber' : 'emerald'} />
                   <div className="mt-3 flex items-center justify-between text-sm">
-                    <span className="text-slate-400">% avance real</span>
+                    <span className="text-slate-400">{t('dash_real_progress')}</span>
                     <span className="font-semibold text-white">{pct}%</span>
                   </div>
-                  <p className="mt-2 text-xs text-slate-500">Planificado a hoy: {planificado}%</p>
+                  <p className="mt-2 text-xs text-slate-500">{t('proyectos_planned_today')}: {planificado}%</p>
                 </div>
               </div>
             </GlassCard>
