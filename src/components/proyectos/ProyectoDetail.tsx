@@ -5,6 +5,7 @@ import { useAppStore, calcCumplimientoGanttProyecto, calcPctProyecto, semaforoCu
 import { Proyecto } from '../../types';
 import { getClientInfo } from '../../utils/clientInfo';
 import { useT } from '../../i18n/useT';
+import { localizeFaseNombre } from '../../i18n/contentTranslations';
 import { AlertPanel } from '../layout/AlertPanel';
 import { GanttView } from '../gantt/GanttView';
 import { GlassCard } from '../ui/GlassCard';
@@ -18,7 +19,7 @@ import { TareasList } from './TareasList';
 type Tab = 'tareas' | 'fases' | 'gantt' | 'expediente' | 'alertas';
 
 export function ProyectoDetail() {
-  const { proyectoActivoId, faseActivaId, proyectos, fases, tareas, setVista } = useAppStore();
+  const { proyectoActivoId, faseActivaId, proyectos, fases, tareas, setVista, idioma } = useAppStore();
   const [tab, setTab] = useState<Tab>('fases');
   const [editing, setEditing] = useState<Proyecto | null>(null);
   const { puedeEditarProyectos } = usePermisos();
@@ -115,7 +116,7 @@ export function ProyectoDetail() {
         <div className="flex items-center justify-between gap-4">
           <div>
             <p className="text-sm text-emerald-300">{faseActiva.codigo}</p>
-            <h2 className="text-2xl font-semibold text-white">{faseActiva.nombre}</h2>
+            <h2 className="text-2xl font-semibold text-white">{localizeFaseNombre(faseActiva.id, faseActiva.nombre, idioma)}</h2>
           </div>
           <button className="rounded-lg border border-white/10 px-4 py-2 text-sm text-slate-300 hover:bg-white/8" onClick={() => setVista('proyecto', proyecto.id)}>
             {t('proyecto_view_all_phases')}

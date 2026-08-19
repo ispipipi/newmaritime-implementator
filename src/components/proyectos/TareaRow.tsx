@@ -1,6 +1,8 @@
 import { FileText } from 'lucide-react';
 import { Tarea } from '../../types';
 import { useT } from '../../i18n/useT';
+import { localizeTareaNombre } from '../../i18n/contentTranslations';
+import { useAppStore } from '../../store/useAppStore';
 import { StatusBadge } from '../ui/StatusBadge';
 
 type Props = {
@@ -10,10 +12,11 @@ type Props = {
 
 export function TareaRow({ tarea, onEdit }: Props) {
   const t = useT();
+  const idioma = useAppStore((s) => s.idioma);
   return (
     <tr className="border-b border-white/8 last:border-0">
       <td className="px-4 py-3">
-        <div className="font-medium text-white">{tarea.nombre}</div>
+        <div className="font-medium text-white">{localizeTareaNombre(tarea.id, tarea.nombre, idioma)}</div>
         {tarea.esMilestone ? <div className="mt-1 text-xs text-amber-300">{t('gantt_col_milestone')}</div> : null}
       </td>
       <td className="px-4 py-3 text-sm text-slate-300">{tarea.responsable}</td>

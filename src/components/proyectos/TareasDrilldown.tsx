@@ -7,6 +7,7 @@ import { diasParaVencimiento, diasVencida, tareaEstaVencida, tareaVenceHoy, tare
 import { usePermisos } from '../../hooks/usePermisos';
 import { useT } from '../../i18n/useT';
 import { translate, DictKey, Idioma } from '../../i18n/translations';
+import { localizeFaseNombre, localizeTareaNombre } from '../../i18n/contentTranslations';
 import { GlassCard } from '../ui/GlassCard';
 import { ProgressBar } from '../ui/ProgressBar';
 import { StatusBadge } from '../ui/StatusBadge';
@@ -387,6 +388,7 @@ export function TareasDrilldown({ tareas, showProjectLevel = true, query = '', s
   const { proyectos, fases, actualizarTarea, usuarioActivo, tareaActivaId, setTareaActiva, perfiles, ejecutivos } = useAppStore();
   const { puedeCambiarEstadoTarea, puedeEditarDatosTarea, esComercial, esRexPlus } = usePermisos();
   const t = useT();
+  const idioma = useAppStore((s) => s.idioma);
   const [selected, setSelected] = useState<Tarea | null>(null);
   const normalized = query.trim().toLowerCase();
   const personasAsignables = useMemo(() => {
@@ -527,7 +529,7 @@ export function TareasDrilldown({ tareas, showProjectLevel = true, query = '', s
                   </span>
                 ) : null}
               </div>
-              <h4 className="line-clamp-2 text-sm font-semibold text-white transition group-hover:text-emerald-100">{tarea.nombre}</h4>
+              <h4 className="line-clamp-2 text-sm font-semibold text-white transition group-hover:text-emerald-100">{localizeTareaNombre(tarea.id, tarea.nombre, idioma)}</h4>
               <p className="mt-1 truncate text-xs text-slate-400">
                 {showProjectLevel ? null : <span>{proyecto?.nombre ?? t('drill_project_fallback')} · </span>}
                 {tarea.responsable}
@@ -604,7 +606,7 @@ export function TareasDrilldown({ tareas, showProjectLevel = true, query = '', s
                   {isOpen ? <ChevronDown className="h-5 w-5 shrink-0 text-slate-500" /> : <ChevronRight className="h-5 w-5 shrink-0 text-slate-500" />}
                   <div className="min-w-0">
                     <p className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-300">{fase.codigo}</p>
-                    <h3 className="truncate font-semibold text-white">{fase.nombre}</h3>
+                    <h3 className="truncate font-semibold text-white">{localizeFaseNombre(fase.id, fase.nombre, idioma)}</h3>
                     <p className="mt-1 text-sm text-slate-500">{tareasFase.length} {t('dash_task_count')}</p>
                   </div>
                 </div>

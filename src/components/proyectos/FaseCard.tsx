@@ -2,6 +2,7 @@ import { Calendar, ChevronRight } from 'lucide-react';
 import { Fase, Tarea } from '../../types';
 import { useAppStore, calcCumplimientoGanttFase, calcPctFase, calcPctPlanificadoFase, semaforoCumplimientoFase } from '../../store/useAppStore';
 import { useT } from '../../i18n/useT';
+import { localizeFaseNombre } from '../../i18n/contentTranslations';
 import { GlassCard } from '../ui/GlassCard';
 import { ProgressBar } from '../ui/ProgressBar';
 import { StatusBadge } from '../ui/StatusBadge';
@@ -14,6 +15,7 @@ type Props = {
 
 export function FaseCard({ fase, tareas }: Props) {
   const setVista = useAppStore((s) => s.setVista);
+  const idioma = useAppStore((s) => s.idioma);
   const t = useT();
   const pct = calcPctFase(fase.id, tareas);
   const cumplimiento = calcCumplimientoGanttFase(fase.id, tareas);
@@ -28,7 +30,7 @@ export function FaseCard({ fase, tareas }: Props) {
         <div className="mb-4 flex items-start justify-between gap-4">
           <div>
             <span className="rounded-md bg-white/8 px-2 py-1 text-xs font-semibold text-emerald-200">{fase.codigo}</span>
-            <h3 className="mt-3 text-lg font-semibold text-white">{fase.nombre}</h3>
+            <h3 className="mt-3 text-lg font-semibold text-white">{localizeFaseNombre(fase.id, fase.nombre, idioma)}</h3>
           </div>
           <div className="flex items-center gap-3">
             <TrafficLightOrb estado={semaforo} size="sm" />

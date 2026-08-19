@@ -6,6 +6,7 @@ import { useAppStore } from '../../store/useAppStore';
 import { usePermisos } from '../../hooks/usePermisos';
 import { useT } from '../../i18n/useT';
 import { DictKey } from '../../i18n/translations';
+import { localizeFaseNombre, localizeTareaNombre } from '../../i18n/contentTranslations';
 import { StatusBadge } from '../ui/StatusBadge';
 import { normalizarResponsable, responsableAsignadoAUsuario } from '../../utils/assignee';
 import { diasVencida, tareaEstaVencida } from '../../utils/taskHealth';
@@ -78,6 +79,7 @@ export function TareaEditDrawer({ tarea, onClose }: Props) {
   } = useAppStore();
   const { puedeCambiarEstadoTarea, puedeEditarDatosTarea, esComercial, esRexPlus } = usePermisos();
   const t = useT();
+  const idioma = useAppStore((s) => s.idioma);
   const [form, setForm] = useState({
     estado: 'pendiente' as EstadoTarea,
     fechaInicioPlan: '',
@@ -303,7 +305,7 @@ export function TareaEditDrawer({ tarea, onClose }: Props) {
                 </span>
               ) : null}
             </div>
-            <h3 className="text-xl font-semibold leading-tight text-white">{tareaActual?.nombre}</h3>
+            <h3 className="text-xl font-semibold leading-tight text-white">{tareaActual ? localizeTareaNombre(tareaActual.id, tareaActual.nombre, idioma) : ''}</h3>
             {tareaActual?.descripcion ? <p className="mt-1 line-clamp-3 text-sm text-slate-400">{tareaActual.descripcion}</p> : null}
             <p className="mt-2 truncate text-xs text-slate-500">{proyecto?.nombre ?? t('ted_project_fallback')}</p>
 
@@ -312,7 +314,7 @@ export function TareaEditDrawer({ tarea, onClose }: Props) {
                 <p className="mb-1 text-[11px] uppercase tracking-[0.14em] text-slate-500">{t('ted_phase_label')}</p>
                 <p className="flex items-center gap-2 text-sm font-medium text-white">
                   <Flag className="h-3.5 w-3.5 text-emerald-300" />
-                  {fase ? `${fase.codigo} · ${fase.nombre}` : t('ted_no_phase')}
+                  {fase ? `${fase.codigo} · ${localizeFaseNombre(fase.id, fase.nombre, idioma)}` : t('ted_no_phase')}
                 </p>
               </div>
               <div className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2">

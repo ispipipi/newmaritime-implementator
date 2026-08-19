@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Fase, Tarea } from '../../types';
 import { useAppStore } from '../../store/useAppStore';
 import { useT } from '../../i18n/useT';
+import { localizeFaseNombre, localizeTareaNombre } from '../../i18n/contentTranslations';
 import { GlassCard } from '../ui/GlassCard';
 
 type Props = {
@@ -59,7 +60,7 @@ export function GanttView({ fases, tareas }: Props) {
 
       rows.push({
         id: `${FASE_PREFIX}${fase.id}`,
-        name: `${abierta ? '▾' : '▸'} ${fase.codigo} · ${fase.nombre} (${tareasFase.length})`,
+        name: `${abierta ? '▾' : '▸'} ${fase.codigo} · ${localizeFaseNombre(fase.id, fase.nombre, idioma)} (${tareasFase.length})`,
         start: inicios[0],
         end: fines[fines.length - 1],
         progress: progresoProm,
@@ -71,7 +72,7 @@ export function GanttView({ fases, tareas }: Props) {
         tareasFase.forEach((t) => {
           rows.push({
             id: t.id,
-            name: t.nombre,
+            name: localizeTareaNombre(t.id, t.nombre, idioma),
             start: t.fechaInicioPlan,
             end: t.fechaFinPlan,
             progress: progressByState[t.estado],
@@ -139,7 +140,7 @@ export function GanttView({ fases, tareas }: Props) {
               }`}
             >
               {abierta ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
-              {fase.codigo} · {fase.nombre}
+              {fase.codigo} · {localizeFaseNombre(fase.id, fase.nombre, idioma)}
               <span className="text-slate-500">({tareasFase.length})</span>
             </button>
           );
